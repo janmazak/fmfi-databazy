@@ -11,8 +11,8 @@
 
 ## Prezentácie zo sveta
 
-* [https://db-book.com/slides-dir/index.html](Database System Concepts) (existuje aj kniha s týmto názvom od Silberschatz et al.)
-* [https://cs186berkeley.net/resources/](Databázy na Berkeley) (prezentácie z minulých rokov, úlohy zo skúšok...)
+* [Database System Concepts](https://db-book.com/slides-dir/index.html) (existuje aj kniha s týmto názvom od Silberschatz et al.)
+* [Databázy na Berkeley](https://cs186berkeley.net/resources/) (prezentácie z minulých rokov, úlohy zo skúšok...)
 
 ## Tutoriály
 
