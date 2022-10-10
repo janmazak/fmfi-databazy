@@ -1,8 +1,11 @@
 # SQL
 
-For most purposes, you can use both SQLite and PostgreSQL. However, SQLite is lightweight and does not provide all the features we want to explore (e.g. older versions lack support for regular expressions).
+For most purposes, you can use both [SQLite](#sqlite) and [PostgreSQL](#postgresql). However, SQLite is lightweight and does not provide all the features we want to explore (e.g. older versions lack support for regular expressions).
+
+For checking syntax of your SQL statements, there are online tools available, e.g. [EverSQL](https://www.eversql.com/sql-syntax-check-validator/).
 
 ## SQLite
+<a name="sqlite"></a>
 
 Essentially, an [SQLite database](https://www.sqlite.org/about.html) is just a regular file, and using it requires no configuration.
 It is available on the server `cvika`, or you can install it on your computer. There is an [online environment](https://sqliteonline.com/) available, too.
@@ -32,6 +35,7 @@ and then running `SELECT * FROM emp;` in the interactive terminal that opens. Do
 For a graphical interface to interact with an SQLite database, we suggest [sqlitebrowser](https://sqlitebrowser.org/). The tab `Execute SQL` allows you to run SQL commands.
 
 ## PostgreSQL
+<a name="postgresql"></a>
 
 PostgreSQL is available on the server `cvika`, or you can install it on your computer. On `cvika`, you have a single database (its name is identical with your username). PostgreSQL is known for its user-friendly [documentation](http://www.postgresql.org/docs/current/interactive/index.html).
 
