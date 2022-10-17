@@ -26,7 +26,7 @@ Hint: https://www.w3schools.com/sql/sql_like.asp, or regular expressions in http
 
 /* 10. How many employees do not work on any project? */
 
-/* 11. How many employees work on all the projects? */
+/* 11. How many employees participate in all of the projects? */
 
 /* 12. Find all departments such that each of their employees is assigned to a project. */
 
