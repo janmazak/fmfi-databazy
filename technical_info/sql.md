@@ -4,6 +4,8 @@ For most purposes, you can use both [SQLite](#sqlite) and [PostgreSQL](#postgres
 
 For checking syntax of your SQL statements, there are online tools available, e.g. [EverSQL](https://www.eversql.com/sql-syntax-check-validator/).
 
+There is a server `cvika.dcs.fmph.uniba.sk` that allows you to use both the mentioned database systems. Account and password are the same as for the university account.
+
 ## SQLite
 <a name="sqlite"></a>
 
