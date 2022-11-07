@@ -109,3 +109,56 @@ Queries:
     ```
     </details>
 
+* pijani, ktorí niečo ľúbia, ale nikdy v krčme nepijú
+
+    <details>
+    <summary>SQL</summary>
+
+    ```sql
+    	SELECT l.P
+    	FROM lubi l
+    	WHERE NOT EXISTS (
+    		SELECT 1
+    		FROM navstivil n, vypil v
+    		WHERE n.I = v.I AND n.P = l.P
+    	)
+    ```
+    </details>
+
+* pijani, čo už pili, a pri každej návšteve krčmy vypijú aspoň liter nejakého (jedného) alkoholu
+
+    <details>
+    <summary>SQL</summary>
+
+    ```sql
+    	SELECT n.P
+    	FROM navstivil n, vypil v
+    	WHERE n.I = v.I AND NOT EXISTS (
+    		SELECT 1
+    		FROM navstivil n2
+    		WHERE n2.P = n.P AND NOT EXISTS (
+    			SELECT 1
+    			FROM vypil v2
+    			WHERE v2.I = n2.I and v2.M >= 1
+    		)
+    	)
+    ```
+    </details>
+
+    <details>
+    <summary>SQL2</summary>
+
+    ```sql
+    	SELECT n.P
+    	FROM navstivil n, vypil v
+    	WHERE n.I = v.I AND NOT EXISTS (
+    		-- funguje za predpokladu, ze pri kazdej navsteve bol vypity aspon 1 alkohol
+    		SELECT 1
+    		FROM navstivil n2 JOIN vypil v2 ON n2.I = v2.I
+    		WHERE n2.P = n.P
+    		GROUP BY n2.I
+    		HAVING MAX(v2.M) < 1
+    	)
+    ```
+    </details>
+
