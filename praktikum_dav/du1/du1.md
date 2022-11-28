@@ -38,7 +38,7 @@ jedno posedenie. Usporiadajte ich podľa P a A.
 
 ### Technické pokyny
 
-* Termín na odovzdanie: **28. 11. 2022**
+* Termín na odovzdanie: **4. 12. 2022**
 * Používajte korektnú syntax SQL podporovanú databázou SQLite 3.34 (overiť si to môžete trebárs na serveri `cvika.dcs.fmph.uniba.sk`). Riešenia so syntaktickými chybami budú hodnotené len minimálnym počtom bodov.
 * Každý dotaz aj s pomocnými reláciami zapíšte do osobitného súboru s príponou `.sql` pomenovaného písmenom zodpovedajúcim zadanému dotazu (napr. `a.sql`). Okrem komentárov by v ňom nemalo byť nič navyše.
 * Súbory `a.sql`, `b.sql`, `c.sql`, `d.sql` odošlite ako prílohu e-mailu na adresu `mazak.fmfi@gmail.com` s predmetom `databazove systemy -- du1`. Tento e-mail musí v tele obsahovať vaše celé meno.
