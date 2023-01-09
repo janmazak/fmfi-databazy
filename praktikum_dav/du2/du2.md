@@ -24,7 +24,7 @@ Pred každý príkaz `CREATE TABLE` (alebo na začiatok súboru) doplňte aj zod
 
 5. Učitelia majú požiadavku na doplnenie informácie, dokedy môže študent pridelený test vypracovať. Napíšte dotaz, ktorý upraví štruktúru tabuliek tak, aby pre každé pridelenie bolo možné evidovať termín, dokedy študent musí test vypracovať.
 
-6. Doplňte na koniec súboru `testy.sql` vytvorenie `VIEW`, ktoré sprístupňuje výsledky študentov v podobe sedmíc `[Meno, Priezvisko, NazovTestu, CasPridelenia, CasVypracovania, VysledokPercenta, ZodpovedaneOtazky]`, kde
+6. Doplňte na koniec súboru `testy.sql` vytvorenie `VIEW student_results`, ktoré sprístupňuje výsledky študentov v podobe sedmíc `[Meno, Priezvisko, NazovTestu, CasPridelenia, CasVypracovania, VysledokPercenta, ZodpovedaneOtazky]`, kde
 	* `NazovTestu` je názov testu, ktorý bol v čase `CasPridelenia` pridelený študentovi s daným menom a priezviskom;
 	* ak študent test už robil, `CasVypracovania` je čas posledného vypracovania testu, `VysledokPercenta` je podiel správnych odpovedí k celkovému počtu otázok testu v tomto čase (v percentách), a `ZodpovedaneOtazky` je počet otázok, ktoré študent zodpovedal (správne či nesprávne);
 	* ak študent test ešte nerobil, `CasVypracovania`, `VysledokPercenta` a `ZodpovedaneOtazky` su `NULL`.
