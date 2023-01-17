@@ -19,11 +19,17 @@ Vytvorte program v Pythone (v jedinom súbore `testy.py`) s nasledovnou funkcion
 * Po spustení si vyžiada prihlasovacie meno študenta; ak sa nenašlo, opakovane si ho bude pýtať znovu.
 * Po zadaní existujúceho prihlasovacieho mena program vypíše zoznam testov pridelených študentovi vrátane doteraz najlepšieho vypracovania ku každému testu (t.j. s najvyšším skóre) a študent zadaním poradového čísla vyberie test, ktorý ide vypracovať.
 * Následne program bude zadávať jednotlivé otázky zvoleného testu v náhodnom poradí. Študent si zakaždým vyberie odpoveď (napísaním jedného z písmen a, b, c, d) a program ju zaznamená do pomocnej tabuľky.
-* Po zodpovedaní všetkých otázok testu program presunie v rámci jedinej transakcie všetky študentove odpovede z pomocnej tabuľky medzi trvalé záznamy a zaeviduje čas vypracovania.
+* Po zodpovedaní všetkých otázok testu program vypíše skóre, presunie v rámci jedinej transakcie všetky študentove odpovede z pomocnej tabuľky medzi trvalé záznamy a zaeviduje čas vypracovania.
 
 Poznámka: Dočasnú tabuľku by sme mohli využiť na priebežné ukladanie študentovej práce a v prípade pádu programu sa potom vie študent vrátiť k nedokončenému testu. Nebudeme to však robiť v rámci tejto domácej úlohy.
 
+#### Ďalšie požiadavky
+
 Nezabudnite na detekciu a spracovanie databázových chýb a súvisiacich výnimiek. (Vo všeobecnosti v reálnej situácii si treba podrobnejšie naštudovať, aké rôzne chyby konkrétny DBMS reportuje, napr. [SQLite](https://www.sqlite.org/rescode.html), ale program v tejto domácej úlohe sa v princípe nevie z chýb zmysluplne spamätať a asi najrozumnejšie je proste ukončiť pri akejkoľvek chybe jeho činnosť.)
+
+Váš programovací štýl nemusí byť zďaleka dokonalý, ale snažte sa držať aspoň základných zásad: zmysluplné pomenovanie premenných, oddelenie častí kódu do funkcií, využitie `?` pri vytváraní databázových dotazov miesto lepenia reťazcov, konzistentné formátovanie atď. Možno sa to nezdá, ale už z prvého pohľadu na kód možno usúdiť nie málo o kvalite vašej práce, a veľká časť schopnosti písať čitateľný kód spočíva vo vytvorení návykov, nestojí to zväčša ani čas navyše (dokonca možno nejaký aj ušetríte, až budete v programe hľadať prípadné chyby).
+
+#### Dáta na vyskúšanie
 
 Do súboru `testy.sql` doplňte pridanie testu s názvom `Trivia` a nasledovnými otázkami (správna odpoveď je označená hviezdičkou):
 ```
@@ -45,6 +51,8 @@ A. Bulgaria
 C. Croatia
 D. Serbia
 ```
+
+Tento test prideľte študentovi s prihlasovacím menom `x`.
 
 ### Technické pokyny
 
