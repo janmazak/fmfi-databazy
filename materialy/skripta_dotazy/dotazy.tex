@@ -1,0 +1,1509 @@
+% use xetex
+\documentclass[10pt, a4paper]{article}
+
+\usepackage{ifxetex}
+\ifxetex
+    \usepackage{fontspec}
+    \usepackage{polyglossia}
+    \setmainlanguage{slovak}
+    \setotherlanguage{english}
+    \usepackage{fontspec}
+    \setmonofont[Scale=.8]{FreeMono}
+\else
+    % some unicode chars rely on xetex
+    % remove them first to use latex
+    \errmessage{Use xetex!}
+
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+    \usepackage[activeacute, slovak]{babel}
+    \usepackage{lmodern}
+\fi
+
+% rozmery stranky
+\addtolength{\voffset}{-3cm}
+\addtolength{\hoffset}{-2.5cm}
+\addtolength{\textwidth}{5 cm}
+\addtolength{\textheight}{5 cm}
+\parindent = 0 pt
+\addtolength{\parskip}{0.5\baselineskip}
+
+\usepackage{csquotes}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[makeroom]{cancel}
+
+
+% AMS-TeX
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{amsthm}
+
+\makeatletter
+\def\thm@space@setup{%
+  \advance\thm@preskip by 10 mm
+  \thm@postskip=\thm@preskip
+}
+\makeatother
+
+\theoremstyle{definition}
+\newtheorem{problem}{Úloha}[section]
+
+\def\beginwrong{\color{red!85!black}}
+\def\endwrong{\color{black}}
+
+\def\hr{
+    \bigskip
+    \hrule
+    \bigskip
+}
+
+% database-related stuff
+\DeclareMathOperator{\join}{\bowtie}
+\DeclareMathOperator{\antijoin}{\rhd}
+
+\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
+\DeclareMathOperator{\SUM}{\textrm{SUM}}
+\DeclareMathOperator{\MAX}{\textrm{MAX}}
+
+
+\DeclareMathOperator{\osoba}{osoba}
+\DeclareMathOperator{\firma}{firma}
+\DeclareMathOperator{\vlastni}{vlastni}
+\DeclareMathOperator{\ponuka}{ponuka}
+\DeclareMathOperator{\chce}{chce}
+\DeclareMathOperator{\lubi}{lubi}
+\DeclareMathOperator{\capuje}{capuje}
+\DeclareMathOperator{\navstivil}{navstivil}
+\DeclareMathOperator{\vypil}{vypil}
+\DeclareMathOperator{\answer}{answer}
+
+
+
+\begin{document}
+
+\pagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+v0.8.1
+
+POZOR --- materiál je nekompletný a môže obsahovať rôzne chyby a nezmysly.
+
+(Budem vďačný za návrhy na zlepšenia: {\tt mazak@dcs.fmph.uniba.sk}.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dotazovacie jazyky}
+
+\begin{itemize}
+\item relačný kalkul
+\item datalog
+\item SQL
+\item relačná algebra (na rozdiel od predošlých aj špecifikuje postup výpočtu)
+\end{itemize}
+
+Pri premýšľaní nad dotazom (alebo jeho časťou) môžete použiť ľubovoľný z jazykov a potom výsledok prepísať do iného jazyka. Toto sa asi najľahšie realizuje pri prepise z datalogu do SQL alebo relačnej algebry. SQL je jazyk pomerne ťažkopádny a má niekoľko nevýhod (pozri napr. \url{https://web.archive.org/web/20110305230025/http://www.cs.duke.edu/courses/spring03/cps216/papers/date-1983.pdf}), ktoré vznikli tým, že nebol navrhnutý \enquote{profesionálne}, ale skôr narýchlo ad-hoc a potom sa presadil na trhu napriek existencii technicky lepších alternatív.
+
+Nebojte sa jazyky kombinovať. Jazyk je v princípe nástroj, a preto sa netreba báť použiť kombináciu nástrojov na riešenie jedného problému. Napríklad na vyjadrenie komplikovanejšej štruktúry kvantifikátorov datalog, ktorý neskôr mechanicky prepíšeme do SQL, a agregáciu nad tými kvantifikovanými dátami zapíšeme rovno v SQL. (Výhodou datalogu oproti SQL pri kvantifikátoroch je ďaleko stručnejší zápis a hlavne sa nestratíme v množstve podmienok za \verb|WHERE|, ktoré stotožňujú výskyty jednej premennej --- v datalogu takéto niečo máme zadarmo, stačí použiť rovnaké písmeno.)
+
+Voľba jazyka, v ktorom premýšľame nad riešením problému, je veľmi dôležitá. Skúste chvíľu reprezentovať čísla pomocou rímskych číslic (vrátane výpočtov typu násobenie) a rýchlo pochopíte jeden z dôvodov, prečo to Rimania v matematike ďaleko nedotiahli. O nič lepšia nie je reprezentácia čísel pomocou kmeňových zlomkov ako v Egypte. Na druhej strane Arabi s nulou a pozičnou sústavou spravili citeľný pokrok. Alternatívne, predstavte si, ako by ste písali webserver alebo databázové dotazy v asembleri.
+
+Riešenia sú naschvál zapisované s rôznym spôsobom formátovania: vyberte si taký, čo sa vám pozdáva (najmä čo sa týka SQL).
+Snažil som sa nepoužiť ťažko čitateľné spôsoby; tie uvedené by mali byť aspoň v princípe OK, aj keď niektoré z nich sa mi pozdávajú viac ako iné.
+
+Pri práci v relačnej algebre či SQL môžete využiť online prostredie RelaX.
+Linky nižšie už obsahujú aj databázovú schému pre databázu pijanov (rozdiel je len v názvoch stĺpcov).
+
+\url{https://dbis-uibk.github.io/relax/calc/gist/51930198d605017448b37c128684e555}
+
+\url{https://dbis-uibk.github.io/relax/calc/gist/5cbffeac631d5fab2f1885e5e922841e}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Úvodné príklady (relačný kalkul, datalog)}
+
+$EDB = \{\osoba(O), \firma(F), \vlastni(Kto, Co)\}$
+
+V tejto časti uvádzame len správne riešenia úloh, nie príklady nesprávnych riešení.
+
+\begin{problem}
+{\bf Firmy vlastnené jedinou osobou a ničím iným.}
+\begin{align*}
+& \{F \mid \firma(F)\land \exists O (\osoba(O)\land \vlastni(O, F) \land \forall X (\vlastni(X, F) \implies X = O))\}\\
+& \{F \mid \firma(F)\land \exists O (\osoba(O)\land \vlastni(O, F) \land \lnot \exists X (\vlastni(X, F) \land X \neq O))\}
+\end{align*}
+\begin{align*}
+\answer(F) & \leftarrow \vlastni(O, F), \osoba(O), \neg \operatorname{inyVlastnik}(F, O).\\
+\operatorname{inyVlastnik}(F, O) & \leftarrow \vlastni(O, F), \vlastni(O_2, F), O_2\neq O.
+\end{align*}
+\begin{align*}
+\answer(F) & \leftarrow \vlastni(O, F), \osoba(O), \neg \operatorname{dvajaVlastnici}(F).\\
+\operatorname{dvajaVlastnici}(F) & \leftarrow \vlastni(O_1, F), \vlastni(O_2, F), O_1\neq O_2.
+\end{align*}
+\end{problem}
+
+\begin{problem}
+{\bf Koneční užívatelia výhod, t.\,j. osoby, ktoré vlastnia firmu, a nie sú vlastnené inou osobou ani firmou. (Pozor: v databáze zatiaľ nie je žiadna kontrola integrity, čiže môžu byť ako vlastníci uvedené entity, ktoré nie sú osobami ani firmami.)}
+\begin{align*}
+\{O \mid \osoba(O) \land \exists F (\firma(F)\land \vlastni(O, F))\land\lnot \exists X (\vlastni(X, O) \land (\osoba(X) \lor \firma(X)))\}
+\end{align*}
+\begin{align*}
+\answer(O) & \leftarrow \osoba(O), \firma(F), \vlastni(O, F), \neg \operatorname{owned}(O).\\
+\operatorname{owned}(O) & \leftarrow \vlastni(X, O), \osoba(X).\\
+\operatorname{owned}(O) & \leftarrow \vlastni(X, O), \firma(X).
+\end{align*}
+\end{problem}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nesprávnych riešení je hocikoľko\dots{} (relačný kalkul, datalog)}
+
+Posolstvom tejto časti je ukázať, že je bezpočet možností, ako napísať chybné riešenie, hoci mnohé chybné riešenia majú k správnemu celkom blízko. Všetky riešenia pochádzajú z istej rozcvičky písanej na treťom cvičení.
+
+Mali by ste trénovať spochybňovanie akéhokoľvek kódu či formálneho zápisu, čo vám príde do rúk (vlastného i cudzieho).
+Preštudujte si všetky chybné riešenia a skúste pre každé z nich v prirodzenom jazyku vyjadriť, čo popisuje, alebo aspoň zdôvodniť, prečo je nesprávne.
+
+$EDB = \{\ponuka(Miesto, Akcia), \chce(Clovek, Miesto, Akcia)\}$
+
+\begin{problem}
+{\bf Akcie, ktoré sú v ponuke na každom mieste, kde ich chcú aspoň dvaja (a sú aspoň niekde v ponuke).}
+
+Správne riešenie (relačný kalkul, tri ekvivalentné zápisy):
+\begin{alignat*}{2}
+\{A \mid (\exists M \ponuka(M, A)) & \land \ \ \forall M \forall C_1 \forall C_2        && [C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A)\implies \ponuka(M, A)]\}\\
+\{A \mid (\exists M \ponuka(M, A)) & \land \neg\exists M \exists C_1 \exists C_2\ \neg  && [C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A)\implies \ponuka(M, A)]\}\\
+\{A \mid (\exists M \ponuka(M, A)) & \land \neg\exists M \exists C_1 \exists C_2        && [C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A)\land \neg \ponuka(M, A)]\}
+\end{alignat*}
+
+Správne riešenie (relačný kalkul, tri ekvivalentné zápisy):
+\begin{alignat*}{2}
+\{A \mid (\exists M \ponuka(M, A)) & \land \ \ \forall M \big[\big(\exists C_1 \exists C_2 && (C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A))\big)\implies \ponuka(M, A)\big]\}\\
+\{A \mid (\exists M \ponuka(M, A)) & \land \neg\exists M \big[\big(\exists C_1 \exists C_2 && (C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A))\big)\land \neg \ponuka(M, A)\big]\}\\
+\{A \mid (\exists M \ponuka(M, A)) & \land \neg\exists M \exists C_1 \exists C_2           && [C_1 \neq C_2 \land \chce(C_1, M, A)\land \chce(C_2, M, A)\land \neg \ponuka(M, A)]\}
+\end{alignat*}
+
+Správne riešenie (datalog) --- porovnajte so zápismi vyššie:
+\begin{align*}
+\answer(A) & \leftarrow \ponuka(\_, A), \neg \operatorname{niekdeNeponuka}(A).\\
+\operatorname{niekdeNeponuka}(A) & \leftarrow \chce(C_1,M,A), \chce(C_2,M,A) , C_1\neq C_2, \neg \ponuka(M,A).
+\end{align*}
+
+Všetky nasledujúce riešenia sú nesprávne (preto tá červená farba). Viete zistiť, v čom sú chybné?
+
+\beginwrong
+\begin{align*}
+\answer(A) & \leftarrow \ponuka(M, A), \chce(C_1, M, A), \chce(C_2, M, A), C_1 \neq C_2.
+\end{align*}
+
+\begin{align*}
+\answer(A)& \leftarrow \ponuka(M,A), \operatorname{miestoChcuDvaja}(M).\\
+\operatorname{miestoChcuDvaja}(M)& \leftarrow \chce(C_1,M,\_), \chce(C_2,M,\_), C_1\neq C_2.
+\end{align*}
+
+\begin{align*}
+\operatorname{chcuAsponDvaja}(M, A) & \leftarrow \chce(C_1, M, A), \chce(C_2, M, A), C_1 \neq C_2.\\
+\operatorname{zlaAkcia}(M, A) & \leftarrow \operatorname{chcuAsponDvaja}(M, A), \neg \ponuka(M, A).\\
+\operatorname{vysledok}(A) & \leftarrow \ponuka(\_, A), \chce(\_, M, \_), \neg \operatorname{zlaAkcia}(M, A).
+\end{align*}
+
+\begin{align*}
+\operatorname{akciuAsponDvaja}(M, A) & \leftarrow \ponuka(M, A), \chce(C_1, M, A), \chce(C_2, M, A), C_1\neq C_2.\\
+\operatorname{nechcuDvaja}(A) & \leftarrow \ponuka(M, A), \neg \operatorname{akciuAsponDvaja}(M, A).\\
+\operatorname{odpoved}(A) & \leftarrow \ponuka(\_, A), \neg \operatorname{nechcuDvaja}(A).
+\end{align*}
+
+\begin{align*}
+\operatorname{pomocna}(A) & \leftarrow \chce(C_1, M, A), \chce(C_2, M, A), C_1\neq C_2, \neg \ponuka(M, A).\\
+\operatorname{answer}(A) & \leftarrow \ponuka(\_, A), \operatorname{pomocna}(A).
+\end{align*}
+
+\begin{align*}
+\operatorname{chcu2}(A)& \leftarrow \chce(C_1,\_,A), \chce(C_2,\_,A), C_1\neq C_2, \neg \operatorname{nievsetky}(A).\\
+\operatorname{nievsetky}(A)& \leftarrow \ponuka(\_,A), \neg \ponuka(M,A).
+\end{align*}
+
+\begin{align*}
+\operatorname{ans}(a) & \leftarrow \ponuka(\_, A), \neg \operatorname{pomoc1}(A).\\
+\operatorname{pomoc1}(A) & \leftarrow \ponuka(M,A), \operatorname{pomoc2}(M,A).\\
+\operatorname{pomoc2}(M,A) & \leftarrow \chce(P_1, M, A), \chce(P_2, M, A), P_1 \neq P_2, \neg \ponuka(M, A).
+\end{align*}
+
+\begin{align*}
+\answer(A) & \leftarrow \ponuka(\_,A), \neg \operatorname{chceAviac2neni}(A).\\
+\operatorname{chceAviac2neni}(A) & \leftarrow \ponuka(\_,A), \neg \operatorname{chceAmenej2aje}(A).\\
+\operatorname{chceAmenej2aje}(A) & \leftarrow \chce(C_1,M,A), \chce(C_2,M,A), C_1 \neq C_2.
+\end{align*}
+
+\begin{align*}
+\answer(A) & \leftarrow \ponuka(M,A), \neg \operatorname{nechcudvaja}(A, M), \chce(\_, M, A).\\
+\operatorname{nechcudvaja}(A, M) & \leftarrow \chce(C_1, M, A), \chce(C_2, M, A), C_1=C_2.
+\end{align*}
+
+\begin{align*}
+\answer(A)& \leftarrow \ponuka(\_, A), \neg \operatorname{notchcu}(A).\\
+\operatorname{notchcu}(A)& \leftarrow \ponuka(\_, A), \chce(C_1, M, \_), \chce(C_2, M, \_), C_1 \neq C_2, \neg \operatorname{not2}(A, M).\\
+\operatorname{not2}(A, M)& \leftarrow \chce(\_, M, A).
+\end{align*}
+\endwrong
+
+\end{problem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bežné chyby}
+
+V mnohých oblastiach ľudskej činnosti viete dosiahnuť veľmi dobré výsledky čisto tým, že sa vyhýbate chybám (silne odporúčam pohľadať na internete niečo na tému \enquote{invert, always invert}; môžete začať napríklad týmto:
+{\small \url{https://www.biznews.com/thought-leaders/1986/06/13/charlie-mungers-speech-to-the-harvard-school-june-1986}}). 
+
+Do istej miery to platí to aj pre tento predmet. Prejdite si preto občas nasledovný zoznam, napríklad zakaždým pri riešení úloh z databázového praktika či pred rozcvičkou.
+
+\begin{enumerate}
+\item všeobecné
+\begin{itemize}
+\item nekorektné argumenty (napr. zámena predikátov/relácií $\navstivil$ a $\vypil$)
+\item množina (relačný kalkul, datalog) vs. multimnožina (SQL, relačná algebra)
+\item nesprávna interpretácia kvantifikátorov:\\
+    $\forall x$ --- pre každý / ľubovoľný / hociktorý prvok $x$, pre všetky $x$\\
+    $\exists x$ --- pre nejaký / niektorý / aspoň jeden prvok $x$, existuje $x$
+\item zlá interpretácia zadaných relácií (napr. prehliadnutie odlišných cien alkoholu v jednotlivých krčmách)
+\end{itemize}
+
+
+\item relačný kalkul
+\begin{itemize}
+\item voľné (nekvantifikované) premenné, napr. $Y$ vo výraze $\{X \mid p(X,Y)\}$
+\item chýbajúce či nesprávne uzátvorkovanie (logické spojky nemajú štandardne definovanú prioritu ani asociovanie ako operátory v jazyku C)
+\item použitie premennej mimo oblasti platnosti (napr. za zátvorkou, vnútri ktorej je kvantifikovaná)
+\item porovnávanie predikátov, napr. $p(X) = h(Y)$
+\item použitie prvkov mimo jazyka ($\cancel\exists$, $\exists!$)
+\item miešanie prvkov datalogu (\_)
+\item chýbajúce podmienky na rôznosť premenných, napr. $\exists X\exists Y (p(X) \land p(Y))$ (ekvivalentné $(\exists X) p(X)$)
+\end{itemize}
+
+\item datalog
+\begin{itemize}
+\item použitie pravidiel, ktoré nie sú bezpečné (naučte sa to zakaždým explicitne skontrolovať)
+\item nepoužitie pomocného pravidla pri negovaní na miestach, kde je to nutné, napr. $p(X)\leftarrow r(X), \lnot q(X, \_)$
+\item nevyužívanie premennej $\_$ (sťažuje čítanie, znemožňuje rýchlu kontrolu, ľahšie sami seba popletiete)
+\item nevhodný názov pomocného predikátu (nezrozumiteľný, v rozpore s definíciou predikátu atď.)
+\item prebytočný argument v pomocnom predikáte --- mení význam: ak popisujeme vlastnosť krčmy, musí byť táto jediným argumentom, jeden argument navyše spôsobí, že už popisujeme vlastnosť dvojice
+\end{itemize}
+
+\item SQL
+\begin{itemize}
+\item syntaktické chyby
+    \begin{itemize}    
+    \item \verb|stlpec = tabulka| miesto \verb|stlpec = (SELECT ... FROM tabulka)|
+    \item \verb|NOT EXISTS IN| miesto \verb|NOT IN|; \verb|NOT IN tabulka| miesto \verb|NOT IN (SELECT ... FROM tabulka)|
+    \item použitie agreg. funkcie na výsledok dotazu, napr. \verb|MAX(SELECT ... FROM ...)|
+    \item použitie agreg. funkcie na reláciu, napr. \verb|MAX(tabulka)|
+    \end{itemize}
+\item chyby vychádzajúce z nepochopenia významu kľúčových slov (nekorektná štruktúra dotazu)
+    \begin{itemize}
+    \item vymenovanie nepovolených stĺpcov za \verb|SELECT| (všetky musia byť aj za \verb|GROUP BY|)
+    \item dvojnásobné agregovanie: \verb|MAX(COUNT(X))|
+    \item použitie agregačnej funkcie za \verb|WHERE| (patrí hneď za \verb|HAVING| alebo \verb|SELECT|)
+    \item podmienka (najmä za \verb|HAVING|), ktorá nevracia bool, napr. \verb|HAVING MAX(t.X)| miesto korektného výpočtu arg max s dvojnásobným použitím \verb|SELECT|
+    \item chybné pokusy o arg max: \verb|SELECT A from t WHERE t.c = MAX(t.c)| --- na nájdenie objektov, pre ktoré sa dosahuje maximum hodnoty, ktorú treba najprv vypočítať grupovaním, treba vždy aspoň dva selecty, napr. \verb|SELECT A from t WHERE t.c = (SELECT MAX(t.c) FROM t)|
+    \item používanie \verb|HAVING| (resp. \verb|WHERE|) na definovanie/pomenovanie nového stĺpca --- \verb|HAVING| slúži výlučne na filtrovanie skupín, pomenovania pre stĺpce sa pridávajú za \verb|SELECT| a agregačnú funkciu je nutné zopakovať, napr. \verb|SELECT COUNT(x) AS c FROM t GROUP BY y HAVING COUNT(x) > 2|
+    \item nepochopenie faktu, že ak \verb|GROUP BY| chýba, ale za \verb|SELECT| je uvedená agregačná funkcia, bude vo výsledku jediný riadok, pretože všetko je v jednej skupine
+    \end{itemize}
+\item ďalšie chyby
+    \begin{itemize}
+    \item chýbajúce podmienky pre join (skúste si to porátať pre každý atribút: ak do vnoreného selectu zvonka vstupuje nejaká hodnota povedzme pre alkohol, pridáva to 1 podmienku; ak sa tam vyskytuje ten atribút v joine povedzme 4x, treba pridať ďalšie 3 podmienky stotožňujúce jednotlivé výskyty --- porovnajte si to s datalogom, tam to funguje analogicky)
+    \item viacnásobné použitie relácie bez premenovania, ak sa prekrýva oblasť platnosti (scope) pre jednotlivé použitia
+    \item používanie pôvodného mena relácie, ak je premenovaná
+    \item neželané duplikáty vo výsledku (alebo za \verb|COUNT|)
+    \item neúmyselný nekorelovaný subselect (vnorený dotaz, ktorého výsledok nezávisí od riadka hlavného dotazu, do ktorého je vnorený)
+    \item nesprávne či chýbajúce použitie \verb|GROUP BY|
+    \item zámena agreg. funkcie, napr. \verb|COUNT| miesto \verb|SUM|
+    \end{itemize}
+\end{itemize}
+
+\item relačná algebra (\emph{na rozdiel od predošlých aj špecifikuje postup výpočtu})
+\begin{itemize}
+\item absencia zátvoriek, ktoré by jednoznačne definovali poradie operácií
+\end{itemize}
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Príklady (bez agregácie)}
+
+$EDB = \{\lubi(P, A), \capuje(K, A), \navstivil(I, P, K), \vypil(I, A, M)\}$\\[2mm]
+$P$ --- pijan, $A$ --- alkohol, $K$ --- krčma, $M$ --- množstvo ($M > 0$),\\
+$I$ --- identifikátor návštevy (v $\navstivil$ sa $I$ vyskytuje len raz
+
+V príkladoch uvádzame správne a niekedy i nesprávne riešenia (červená farba zvýrazňuje chybu alebo označuje nesprávne riešenie ako celok).
+
+\begin{problem}
+{\bf Alkoholy, ktoré sa čapujú, ale nikto ich nepil.}\\
+\begin{minipage}{0.49\textwidth}
+\begin{align*}
+\answer(A) &\leftarrow \capuje(\_, A), \lnot\operatorname{niektoPil}(A).\\
+\operatorname{niektoPil}(A) &\leftarrow \vypil(\_, A, \_).\\
+\end{align*}
+\begin{align*}
+\pi_A(\capuje)\antijoin\vypil
+\end{align*}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{align*}
+\beginwrong\answer(A)\endwrong &\leftarrow \capuje(\_, A), \beginwrong\lnot\vypil(\_, A, \_)\endwrong.\\[10mm]
+& /* \quad \textit{nájdite 3 chyby} \quad */\\
+\answer(A) &\leftarrow \capuje(\_, A), \operatorname{niktoNepil}(A).\\
+\beginwrong\operatorname{niktoNepil}(A)\endwrong &\leftarrow \vypil(\_, A_2, \_), A_2\neq \beginwrong A\endwrong.
+\end{align*}
+\end{minipage}
+\end{problem}
+
+\begin{problem}
+{\bf Alkoholy, ktoré ľúbi každý pijan, čo niečo ľúbi (a aspoň niekto).}
+\begin{align*}
+\answer(A) &\leftarrow \lubi(\_, A), \lnot\operatorname{pijanCoNelubi}(A).\\
+\operatorname{pijanCoNelubi}(A) &\leftarrow \lubi(P, \_), \lubi(\_, A), \lnot\lubi(P, A).\\
+\end{align*}
+\begin{align*}
+\operatorname{p} & = (\pi_P(\lubi) \times \pi_A(\lubi))\antijoin \lubi\\
+\answer & = \pi_A(\lubi) \antijoin \operatorname{p}
+\end{align*}
+\begin{verbatim}
+    SELECT DISTINCT l.A
+    FROM lubi l
+    WHERE NOT EXISTS (
+        SELECT 1 FROM lubi l2
+        WHERE NOT EXISTS (
+            SELECT 1 FROM lubi l3
+            WHERE l3.P = l2.P AND l3.A = l.A
+        )
+    )
+\end{verbatim}
+\end{problem}
+
+\begin{problem}
+{\bf Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.}
+\begin{align*}
+\Big\{A\mid (\exists I\,\exists M\vypil(I, A, M))&\land \lnot \Big[\exists P (\exists A_2\lubi(P, A_2))\land\lnot\lubi(P, A))\Big)\Big]\\
+&\land \lnot\Big[\exists K \Big((\exists A_2 \capuje(K, A_2))\land \lnot\capuje(K, A)\Big)\Big]\Big\}
+\end{align*}
+\begin{align*}
+\operatorname{nelubenyNiekym}(A) &\leftarrow \vypil(\_, A, \_), \lubi(P, \_), \lnot\lubi(P, A).\\
+\operatorname{necapovanyNiekde}(A) &\leftarrow \vypil(\_, A, \_), \capuje(K, \_), \lnot\capuje(K, A).\\
+\answer(A) &\leftarrow \vypil(\_, A, \_), \lnot\operatorname{nelubenyNiekym}(A), \lnot\operatorname{necapovanyNiekde}(A).\\
+\end{align*}
+\begin{align*}
+\operatorname{nelubenyNiekym} & = (\pi_A(\vypil)\times \pi_P(\lubi))\antijoin \lubi\\
+\operatorname{necapovanyNiekde} & = (\pi_A(\vypil)\times \pi_K(\capuje))\antijoin \capuje\\
+\answer & = ((\pi_A(\vypil) \antijoin \operatorname{nelubenyNiekym})\antijoin \operatorname{necapovanyNiekde}\\
+\end{align*}
+{\small
+\begin{verbatim}
+    SELECT DISTINCT v.A
+    FROM vypil v
+    WHERE NOT EXISTS (SELECT 1 FROM lubi l
+                    WHERE NOT EXISTS (SELECT 1 FROM lubi l2
+                                        WHERE l2.P = l.P AND l2.A = v.A))
+        AND NOT EXISTS (SELECT 1 FROM capuje c
+                        WHERE NOT EXISTS (SELECT 1 FROM capuje c2
+                                        WHERE c2.K = c.K AND c2.A = v.A))
+\end{verbatim}
+}
+\end{problem}
+
+\begin{problem}
+{\bf Krčmy, ktoré navštívil každý pijan, čo niekedy pil a čapujú všetko, čo sa kedy pilo (a aspoň niečo).}
+\begin{align*}
+\Big\{K\mid (\exists A\capuje(K, A))&\land \lnot \Big[\exists P\Big(\exists I\,\exists A\,\exists M (\vypil(I, A, M)\land \navstivil(I, P, K))\Big)\land \lnot\exists I_2\navstivil(I_2, P, K)\Big]\\
+&\land \lnot\Big[\exists A \Big((\exists I\exists M \vypil(I, A, M))\land \lnot\capuje(K, A)\Big)\Big]\Big\}
+\end{align*}
+\begin{align*}
+\answer(K) &\leftarrow \capuje(K, \_), \lnot\operatorname{nenavstivenaNiekym}(K), \lnot\operatorname{necapujeNieco}(K).\\
+\operatorname{necapujeNieco}(K) &\leftarrow \capuje(K, \_), \vypil(\_, A, \_), \lnot\capuje(K, A).\\
+\operatorname{navstivilNiekedy}(P, K) &\leftarrow \navstivil(\_, P, K).\\
+\operatorname{nenavstivenaNiekym}(K) &\leftarrow \capuje(K, \_), \navstivil(I, P, \_), \vypil(I, \_, \_), \lnot\operatorname{navstivilNiekedy}(P, K).\\
+\end{align*}
+\beginwrong Chybné verzie $\operatorname{nenavstivenaNiekym}$:\endwrong
+\begin{align*}
+\operatorname{nenavstivenaNiekym}(K) &\leftarrow \navstivil(I, P, \_), \vypil(I, \_, \_), \beginwrong \lnot\navstivil(\_, P, K)\endwrong, \capuje(K, \_).\\
+\operatorname{nenavstivenaNiekym}(K) &\leftarrow \navstivil(I, P, \_), \vypil(I, \_, \_), \beginwrong \lnot\navstivil(I_2, P, K), \navstivil(I_2, \_, \_)\endwrong, \capuje(K, \_).
+\end{align*}
+\end{problem}
+
+\begin{problem}
+{\bf Alkoholy, ktoré niekto ľúbi a čapuje ich každá krčma, ktorú nenavštívil Fero.}
+\begin{align*}
+& \operatorname{bolTam}(P, K) \Longleftrightarrow \exists I \navstivil(I, P, K)\\
+\{A\mid \lubi(\_, A) & \land \forall K (\neg\operatorname{bolTam}(\operatorname{fero}, K)\implies \capuje(K, A))\}\\
+\{A\mid \lubi(\_, A) & \land \neg\exists K (\neg\operatorname{bolTam}(\operatorname{fero}, K)\land \neg \capuje(K, A))\}
+\end{align*}
+\begin{align*}
+\operatorname{navstivilFero}(K) &\leftarrow \navstivil(I, \operatorname{fero}, K).\\
+\operatorname{nevhodna}(K, A) &\leftarrow \capuje(K, \_), \neg\operatorname{navstivilFero}(K), \neg\capuje(K, A), \lubi(\_, A).\\
+\answer(A) &\leftarrow \lubi(\_, A), \capuje(K, \_), \neg\operatorname{nevhodna}(K, A).
+\end{align*}
+
+\begin{minipage}[t]{0.49\textwidth}
+\small
+\begin{verbatim}
+SELECT DISTINCT l.A
+FROM l
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM c
+    /* c.K nenavstivil Fero a necapuje l.A */
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM n
+        WHERE n.K = c.K AND n.P = 'Fero'
+    ) AND NOT EXISTS (
+        SELECT 1
+        FROM c c2
+        WHERE c2.K = c.K AND c2.A = l.A
+    )
+);
+\end{verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.49\textwidth}
+\small
+\begin{verbatim}
+CREATE TEMPORARY TABLE krcmyBezFera AS (
+    SELECT c.K
+    FROM capuje c
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM navstivil n
+        WHERE n.K = c.K AND n.P = 'Fero'
+    )
+);
+SELECT DISTINCT l.A
+FROM l
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM krcmyBezFera kbf
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM c
+        WHERE c.K = kbf.K AND c.A = l.A
+    )
+);
+\end{verbatim}
+\end{minipage}
+\end{problem}
+
+\begin{problem}
+{\bf Nájdite pijanov, ktorí navštívili presne tie isté krčmy ako Ignác. Predpokladáme, že Ignác navštívil krčmu aspoň raz.}
+
+\begin{align*}
+\answer(P) & \leftarrow \navstivil( \_,P,K), \lnot \operatorname{navIgnac}(P), \lnot \operatorname{nenavIgnac}(P).\\
+\operatorname{nav}(P,K) & \leftarrow \navstivil(\_,P,K).\\
+\operatorname{navIgnac}(P) & \leftarrow \operatorname{nav}(ignac,K), \lnot \operatorname{nav}(P,K), \navstivil (\_ ,P,\_).\\
+\operatorname{nenavIgnac}(P) & \leftarrow \operatorname{nav}(P,K), \lnot \operatorname{nav}(ignac,K).
+\end{align*}
+
+\end{problem}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Príklady (s agregáciou)}
+$EDB = \{\lubi(P, A), \capuje(K, A, C), \navstivil(I, P, K), \vypil(I, A, M)\}$\\[2mm]
+$P$ --- pijan, $A$ --- alkohol, $K$ --- krčma, $C$ --- jednotková cena, $M$ --- množstvo ($M > 0$),\\
+$I$ --- identifikátor návštevy (v $\navstivil$ sa $I$ vyskytuje len raz)
+
+
+
+\begin{problem}
+{\bf Krčmy, ktoré čapujú aspoň $5$ alkoholov a nečapujú žiadne dva alkoholy za rovnakú cenu.}\\[5mm]
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+SELECT c.K
+FROM capuje AS c
+WHERE NOT EXISTS (SELECT 1
+                  FROM capuje AS c2
+                  WHERE c2.K = c.K AND
+                        c2.A <> c.A AND
+                        c2.C = c.C)
+GROUP BY c.K
+HAVING COUNT(c.A) >= 5;
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+SELECT c.K
+FROM capuje AS c
+GROUP BY c.K
+HAVING COUNT(c.A) >= 5
+
+EXCEPT
+
+SELECT c1.K
+FROM capuje c1, capuje c2
+WHERE c1.K = c2.K AND
+      c1.A <> c2.A AND
+      c1.C = c2.C;
+\end{verbatim}
+\end{minipage}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Krčmy, ktoré navštevuje jediný pijan a boli navštívené aspoň $5$-krát.}\\[5mm]
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+SELECT n.K
+    FROM n
+    GROUP BY n.K
+    HAVING COUNT(n.I) >= 5
+EXCEPT
+SELECT n1.K
+    FROM n AS n1, n AS n2
+    WHERE n1.K = n2.K AND n1.P <> n2.P;
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+SELECT n.K
+FROM n
+WHERE NOT EXISTS (SELECT 1
+                  FROM n AS n2
+                  WHERE n2.K = n.K AND
+                        n2.P <> n.P)
+GROUP BY n.K
+HAVING COUNT(n.I) >= 5;
+\end{verbatim}
+\end{minipage}
+
+\hr
+
+\begin{minipage}{\textwidth}
+\begin{verbatim}
+SELECT n.K
+FROM n
+GROUP BY n.K
+HAVING COUNT(DISTINCT n.P) = 1 AND COUNT(n.I) >= 5;
+\end{verbatim}
+\end{minipage}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Počet krčiem, ktoré čapujú aspoň dva alkoholy z tých, čo ľúbi Fero.}
+
+\begin{verbatim}
+feroveOblubeneA = π Alkohol (σ lubi.Pijan = 'fero' (lubi))
+c = π Krcma, Alkohol (capuje)
+c1 = ρ Alkohol → A1 (c ⨝ feroveOblubeneA)
+c2 = ρ Alkohol → A2 (c ⨝ feroveOblubeneA)
+γ ; COUNT(DISTINCT Krcma) -> N (π Krcma (σ A1 <> A2 (c1 ⨝ c2)))
+\end{verbatim}
+
+\hr
+
+\begin{verbatim}
+ferove = (σ P = 'Fero' (lubi)) ⨝ capuje
+krcmy = π K (σ p>=2 (γ capuje.K; COUNT(A)→p (ferove))
+γ ; COUNT(K) (krcmy)
+\end{verbatim}
+
+\hr
+
+\begin{verbatim}
+lubiFero = σ P = 'fero' (lubi)
+nelubiFero = π A (capuje ▷ lubiFero)
+capujePocet = γ K; COUNT(A)->Pocet (capuje ▷ nelubiFero)
+γ ; COUNT(K) (σ Pocet>1 (capujePocet))
+\end{verbatim}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Pijani, ktorí ľúbia najviac alkoholov spomedzi tých, čo sa nikde nečapujú (a aspoň jeden taký alkohol ľúbia).}
+
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+WITH pocty AS (
+    SELECT l.P, COUNT(l.A) AS N
+    FROM lubi l
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM capuje c
+        WHERE c.A = l.A
+    )
+    GROUP BY l.P
+)
+
+SELECT p.P
+FROM pocty p
+WHERE p.N = (
+    SELECT MAX(p2.N)
+    FROM pocty p2
+)
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+WITH pocetLubenychNecapovanych AS (
+    SELECT l.P, COUNT(DISTINCT l.A) AS pocet
+    FROM lubi l
+    WHERE NOT EXISTS (
+        SELECT 1 FROM capuje c
+        WHERE l.A = c.A
+    )
+    GROUP BY l.P
+)
+SELECT DISTINCT pln.P
+FROM pocetLubenychNecapovanych pln
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM pln pln2
+    WHERE pln.pocet < pln2.pocet
+);
+\end{verbatim}
+\end{minipage}
+\begin{align*}
+\operatorname{p} & = \Gamma_{P; \COUNT(\delta A)\rightarrow Pocet}(\lubi\antijoin\capuje)\\
+\operatorname{max} & = \rho_{M\rightarrow Pocet}(\Gamma_{\MAX(Pocet)\rightarrow M}(\operatorname{p}))\\
+\answer &  = \pi_P (\operatorname{p}\join \operatorname{max})
+\end{align*}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Počet pijanov, ktorí ochutnali každý alkohol čapovaný v aspoň dvoch krčmách (a niečo pili).}
+
+\begin{verbatim}
+nv = navstivil ⨝ vypil
+c = ρ Krcma → K, Alkohol → A (capuje)
+c2 = ρ Krcma → K2, Alkohol → A2 (capuje)
+alkohol_v_dvoch = π A (c) ⨝ K != K2 ∧ A = A2 (c2)
+nepili_jeden_taky = π Pijan (((π Pijan (nv)) x alkohol_v_dvoch) ▷ nv)
+γ ; COUNT(DISTINCT Pijan) (nv ▷ nepili_jeden_taky)
+\end{verbatim}
+
+\hr
+
+\begin{verbatim}
+nv = navstivil ⨝ vypil
+ap = γ Alkohol; count(Krcma)→Pocet (capuje)
+nepili_co_mali = π Pijan (((π Pijan (nv)) x π A (σ Pocet >= 2 (ap))) ▷ nv)
+γ ; COUNT(DISTINCT Pijan) (nv ▷ nepili_co_mali)
+\end{verbatim}
+
+\hr
+
+\begin{verbatim}
+SELECT COUNT(DISTINCT n.P)
+    FROM navstivil n JOIN vypil v ON n.I = v.I
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM capuje c1, capuje c2
+        WHERE c1.A = c2.A AND c1.K <> c2.K
+            AND NOT EXISTS (
+                SELECT 1
+                FROM navstivil nav 
+                JOIN vypil vyp ON nav.I = vyp.I
+                WHERE nav.P = n.P AND vyp.A = c1.A
+            )
+    )
+\end{verbatim}
+\end{problem}
+
+
+\begin{problem}
+{\bf Pod pijanmi budeme v tejto úlohe rozumieť návštevníkov krčiem.
+Úspešný pijan: v každej krčme, čo navštívil, čapujú niečo, čo ľúbi.
+Vytvorte zoznam úspešných pijanov a vypočítajte ich podiel medzi všetkými pijanmi.}\\[5mm]
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+WITH neuspesni AS (
+    SELECT n.P
+    FROM n
+    WHERE NOT EXISTS (
+        SELECT 1 FROM c
+        JOIN l ON l.P = n.P AND l.A = c.A
+        WHERE c.K = n.K
+    )
+)
+CREATE TEMPORARY TABLE uspesni AS (
+    SELECT DISTINCT P FROM n
+    EXCEPT
+    SELECT P FROM neuspesni
+);
+SELECT (SELECT COUNT(P) FROM uspesni)
+    / (SELECT COUNT(DISTINCT P) FROM n);
+\end{verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+CREATE TEMPORARY TABLE uspesni AS (
+    SELECT DISTINCT P
+    FROM n
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM n n2
+        WHERE n2.P = n.P
+        AND NOT EXISTS (
+            SELECT 1
+            FROM c, l
+            WHERE c.K = n2.K
+            AND l.A = c.A
+            AND l.P = n.P
+        )
+);
+SELECT COUNT(DISTINCT u.P) /
+       COUNT(DISTINCT n.P)
+FROM n, uspesni u;
+\end{verbatim}
+\end{minipage}
+\end{problem}
+
+\begin{problem}
+{\bf Dvojice [K, N], kde K je krčma, čo niečo čapuje, a N je počet návštev K, počas ktorých boli vypité všetky alkoholy, čo K čapuje.}\\[5mm]
+
+\begin{verbatim}
+SELECT c.K, COUNT(n.I)
+FROM capuje c 
+    JOIN navstivil n ON n.K = c.K
+WHERE NOT EXISTS (
+    /* A capovany v n.K, ktory nebol vypity pri n.I */
+    SELECT 1
+    FROM capuje c2
+    WHERE c2.K = n.K AND NOT EXISTS (
+        SELECT 1
+        FROM vypil v
+        WHERE v.I = n.I AND v.A = c2.A        
+    )
+)
+GROUP BY c.K
+\end{verbatim}
+\end{problem}
+
+\begin{problem}
+{\bf Vypočítajte celkové tržby T za predaj najobľúbenejšieho alkoholu A (t.\,j. takého, ktorý ľúbi najviac pijanov --- ak je takých viac, počítame tržby osobitne pre každý z nich); vo výsledku dvojice [A, T].}\\[5mm]
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+WITH alcohol_count AS (
+    SELECT A, COUNT(P) as pocet
+    FROM l GROUP BY l.A
+) CREATE TEMPORARY TABLE najoblub AS (
+    SELECT ac.A
+    FROM alcohol_count AS ac
+    WHERE ac.pocet = (
+        SELECT MAX(a.pocet)
+        FROM alcohol_count AS a)
+);
+SELECT v.A, SUM(v.M * c.C)
+FROM v JOIN n ON n.I = v.I
+    JOIN c ON c.A = v.A AND c.K = n.K
+    JOIN najoblub AS na ON na.A = v.A
+GROUP BY v.A
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\end{minipage}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Pijani, ktorí už pili a pijú len alkoholy čapované za cenu nižšiu ako priemerná (cez všetky krčmy čapujúce daný alkohol).}\\[5mm]
+
+\begin{verbatim}
+priemerne_ceny = γ A; avg(Cena) → PriemernaCena (capuje)
+drahe = π K, A (σ Cena ≥ PriemernaCena (capuje ⨝ priemerne_ceny))
+(π P (navstivil ⨝ vypil)) ▷ ((navstivil ⨝ vypil) ⨝ drahe)
+\end{verbatim}
+
+\begin{verbatim}
+WITH priemery AS (
+    SELECT c.A, AVG(c.C) AS priemer
+    FROM capuje c
+    GROUP BY c.A
+)
+SELECT n1.P
+FROM navstivil n1, vypil v1
+WHERE n1.I = v1.I AND NOT EXISTS (
+    SELECT 1
+    FROM navstivil n2, vypil v2, priemery p, capuje c
+    WHERE n2.I = v2.I AND c.K = n2.K AND c.A = v2.A AND n2.P = n1.P AND p.A = c.A AND c.C >= p.priemer
+)
+\end{verbatim}
+
+\beginwrong
+\begin{verbatim}
+WITH priemery AS ...
+SELECT DISTINCT n1.P
+FROM navstivil n1, vypil v1, priemery
+WHERE n1.I = v1.I AND NOT EXISTS (
+    SELECT 1
+    FROM navstivil n2 JOIN vypil v2, capuje c2
+    WHERE n2.I = n1.I AND c2.K = n2.K AND c2.A = v2.A AND n2.P = n1.P
+        AND priemery.A = v2.A AND c2.C >= priemery.priemer
+);
+\end{verbatim}
+\endwrong
+
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Krčmy, ktoré niečo čapujú, ale väčšina návštevníkov v nich nič neľúbi (ak pijan navštívi krčmu viackrát, rátame ho medzi návštevníkov len raz).}\\[5mm]
+
+\begin{verbatim}
+WITH lubi_v_krcme AS (
+    SELECT c.K, COUNT(DISTINCT l.P) AS pocet
+    FROM capuje c
+    JOIN navstivil n ON c.K = n.K
+    JOIN lubi l ON n.P = p.P AND c.A = l.A
+    GROUP BY c.K
+),
+WITH nelubi_v_krcme AS (
+    SELECT c.K, COUNT(DISTINCT n.P) AS pocet
+    FROM capuje c
+    JOIN navstivil n ON c.K = n.K
+    WHERE NOT EXISTS(
+        SELECT 1
+        FROM capuje c2
+        JOIN lubi l ON c2.A = l.A AND n.P = l.P
+        WHERE c.K = c2.K
+    )
+    GROUP BY c.K
+)
+SELECT l.K
+FROM lubi_v_krcme l
+JOIN nelubi_v_krcme n ON l.K = n.K AND l.pocet < n.pocet;
+\end{verbatim}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Nájdite všetkých pijanov, ktorí pili aspoň raz a nie je pravda, že by v nejakej krčme celkovo prepili viac ako v niektorých dvoch iných dokopy.}\\[5mm]
+
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+CREATE TEMPORARY TABLE prepil (
+    SELECT n.P, n.K, SUM(v.M * c.C) AS Suma
+    FROM navstivil n, capuje c, vypil v
+    WHERE n.I = v.I AND c.A = v.A AND n.K = c.K
+    GROUP BY n.P, n.K
+)
+
+CREATE TEMPORARY TABLE dvojice (
+    SELECT p1.P, p1.K AS K1, p2.K AS K2,
+        (p1.Suma + p2.Suma) AS Sucet
+    FROM prepil p1, prepil p2
+    WHERE p1.P = p2.P AND p1.K != p2.K
+)
+
+CREATE TEMPORARY TABLE zli_pijani (
+    SELECT DISTINCT p.P
+    FROM prepil p, dvojice d
+    WHERE p.P = d.P 
+        AND p.K != d.K1 AND p.K != d.K2
+        AND p.Suma > p.Sucet
+)
+
+SELECT DISTINCT n.P
+FROM navstivil n, vypil v
+WHERE n.I = v.I
+EXCEPT (SELECT P from zli_pijani)
+\end{verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+CREATE TEMPORARY TABLE P_celkove_prepil_v_K AS (
+    SELECT n.P, n.K, SUM(v.M*c.C) AS cena 
+    FROM navstivil AS n, capuje AS c, vypil AS v
+    WHERE n.I=v.I AND 
+          n.K=c.K AND 
+          c.A=v.A
+    GROUP BY n.P, n.K
+);
+
+SELECT n.P
+FROM n, v
+WHERE n.I = v.I AND NOT EXISTS (
+    SELECT 1
+    FROM P_celkove_prepil_v_K AS b1,
+        P_celkove_prepil_v_K AS b2,
+        P_celkove_prepil_v_K AS b3
+    WHERE b1.cena > b2.cena + b3.cena AND
+        b2.K <> b3.K AND
+        b1.P = n.P AND
+        b2.P = n.P AND
+        b3.P = n.P
+)
+\end{verbatim}
+\end{minipage}
+
+\begin{align*}
+\answer(P) &\leftarrow \navstivil(I,P,\_), \vypil(I,\_,\_), \lnot \operatorname{mocnyUcet}(P).\\
+\operatorname{mocnyUcet}(P) &\leftarrow \operatorname{ucet}(P,K_1,U_1), \operatorname{ucet}(P,K_2,U_2), \operatorname{ucet}(P,K_3,U_3),\\
+ & \qquad K_1\neq K_2, K_2\neq K_3, K_1\neq K_3, U_1 > U_2 + U_3.\\
+\operatorname{ucet}(P,K,U) &\leftarrow subtotal(\operatorname{p}(\_,P,K,\_,C,M), [P,K], [U=\SUM(C*M)]).\\
+\operatorname{p}(I,P,K,A,C,M) &\leftarrow \navstivil(I,P,K), \vypil(I,A,M), \capuje(K,A,C).\\
+\end{align*}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Krčmy, čo niečo čapujú a v ktorých je viac ako polovica tržieb dosiahnutá za alkoholy, ktoré ľúbi aspoň niekto a ľúbia ich všetci pijani (čo niečo ľúbia) okrem práve jedného.}
+
+
+Najprv alkoholy, ktoré ľúbi aspoň niekto a ľúbia ich všetci pijani (čo niečo ľúbia) okrem práve jedného.
+
+\begin{align*}
+\operatorname{alkoholyCoLubiaVsetciOkrem1}(K) &\leftarrow \lubi(\_, A), \lubi(P, \_), \lnot \lubi(P, A), \lnot \operatorname{niektoInyNelubi}(A, P).\\
+\operatorname{niektoInyNelubi}(A, P) &\leftarrow \lubi(\_, A), \lubi(P, \_), \lubi(P2, \_), P2\neq P, \lnot \lubi(P2, A).
+\end{align*}
+
+\begin{align*}
+\operatorname{alkoholyCoLubiaVsetciOkrem1}(K) &\leftarrow \lubi(\_, A), \lubi(P, \_), \lnot \lubi(P, A), \lnot \operatorname{dvajaNelubia}(A).\\
+\operatorname{dvajaNelubia}(A) &\leftarrow \lubi(\_, A), \lubi(P1, \_), \lubi(P2, \_), P1\neq P2, \lnot\lubi(P1, A), \lnot \lubi(P2, A).\\
+\end{align*}
+
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+CREATE TEMPORARY TABLE spravne_alkoholy as (
+    SELECT l.A
+    FROM lubi l
+    WHERE EXISTS (
+        SELECT p.P
+        FROM lubi p
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM lubi
+            WHERE lubi.P = p.P AND lubi.A = l.A
+        )
+    ) AND NOT EXISTS (
+        SELECT p1.P, p2.P
+        FROM lubi p1, lubi p2
+        WHERE p1.P <> p2.P AND NOT EXISTS (
+            SELECT 1
+            FROM lubi
+            WHERE lubi.P = p1.P AND lubi.A = l.A
+        ) AND NOT EXISTS (
+            SELECT 1
+            FROM lubi
+            WHERE lubi.P = p2.P AND lubi.A = l.A
+        )
+    )
+);
+\end{verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.49\textwidth}
+\begin{verbatim}
+CREATE TEMPORARY TABLE spravne_alkoholy AS (
+    SELECT a.A
+    FROM lubi a, lubi p
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM lubi l
+        WHERE l.A = a.A AND l.P = p.P 
+    )
+    GROUP BY a.A
+    HAVING COUNT(DISTINCT p.P) = 1
+);
+\end{verbatim}
+\end{minipage}
+
+A teraz už len zrátame tržby.
+
+\begin{minipage}[t]{0.6\textwidth}
+\begin{verbatim}
+/* trzby za vsetky alkoholy */
+WITH vsetky_trzby as (
+    SELECT c.K, SUM(n.Mnozstvo * c.Cena) AS trzba
+    FROM capuje c, navstivil n, vypil v
+    WHERE n.I = v.I AND c.K = n.K AND c.A = v.A
+    GROUP BY c.K
+),
+/* trzby za spravne alkoholy */
+spravne_trzby as (
+    SELECT c.K, SUM(n.Mnozstvo * c.Cena) AS trzba
+    FROM capuje c, navstivil n, vypil v
+    WHERE n.I = v.I AND c.K = n.K AND c.A = v.A
+        AND EXISTS (
+            SELECT 1
+            FROM spravne_alkoholy sa
+            WHERE v.A = sa.A
+        )
+    GROUP BY c.K
+)
+\end{verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\begin{verbatim}
+SELECT c.K
+FROM capuje c
+WHERE EXISTS (
+    SELECT 1
+    FROM spravne_trzby s, vsetky_trzby v
+    WHERE s.K = c.K AND v.K = c.K 
+        AND 2 * s.trzba > v.trzba
+)
+\end{verbatim}
+\end{minipage}
+
+\medskip
+
+Podstatne stručnejšie v relačnej algebre a datalogu (premyslite si, kde by sa ešte dal skrátiť):
+\begin{verbatim}
+nelubi_prave_jeden = π Alkohol (σ N=1 (γ A; count(P)→N (((π P lubi) x (π A lubi)) ▷ lubi)))
+nvc = (navstivil ⨝ vypil) ⨝ capuje
+trzby_npj = π K, Tnpj ← M*Cena ( (γ K, A, Cena; SUM(Mnozstvo)→M (nvc ⨝ nelubi_prave_jeden) )
+trzby_celkovo = π K, T ← M*Cena ( (γ K, A, Cena; SUM(Mnozstvo)→M (nvc) )
+π K (σ Tnpj > T/2 (trzby_celkovo ⨝ trzby_npj))
+\end{verbatim}
+
+\begin{verbatim}
+krcma_group(I,K,A,C,M) :- navstivil(I,P,K), vypil(I,A,M), capuje(K,A,C).
+trzby_celkovo(K,T) :- subtotal(krcma_group(_,K,_,C,M), [K], [T=SUM(C*M)]).
+alkoholy_lubia_vsetci(A) :- lubi(_,A), \+zly_pijan(A, P2), lubi(P2,_),\+lubi(P2,A).
+zly_pijan(A,P2) :- lubi(P,_),lubi(_,A), \+lubi(P,A), lubi(P2,_), \+P=P2.
+krcma_group2(I,K,A,C,M) :- navstivil(I,P,K), vypil(I,A,M), capuje(K,A,C), alkoholy_lubia_vsetci(A).
+trzby_za_alkoholy(K,T) :- subtotal(krcma_group2(_,K,_,C,M), [K], [T=SUM(C*M)]).
+result(K) :- capuje(K,_,_), trzby_celkovo(K,T), trzby_za_alkoholy(K,T2), T2>(T/2).
+\end{verbatim}
+\end{problem}
+
+
+
+\begin{problem}
+{\bf Dvojice [K, A] také, že krčma K čapuje alkohol A za cenu nižšiu ako je priemerná cena A (cez všetky krčmy, čo A čapujú), a každý pijan, ktorý niekde pil A za cenu vyššiu ako v K, ho pil aj v K.}\\[5mm]
+
+\begin{verbatim}
+priemernaCenaAlkoholu(A, PC) :- subtotal(capuje(K, A, C), [A], [PC = AVG(C)]).
+asponRazVypilAvK(P, A, K) :- n(Id, P, K), vypil(Id, A, _).
+pijanNiekdeVypilDrahsiAleNikdyNevypilAvK(K, A, C) :- capuje(K, A, C), capuje(K2, A, C2), C2 > C,
+        n(I, P, K2), vypil(I, A, _), \+asponRazVypilAvK(P, A, K).
+answer(K, A) :- capuje(K, A, C), priemernaCenaAlkoholu(A, PriemernaCenaA), C < PriemernaCenaA,
+        \+pijanNiekdeVypilDrahsiAleNikdyNevypilAvK(K, A, C).
+\end{verbatim}
+
+\hr
+
+\begin{verbatim}
+WITH priemerne_ceny AS (
+    SELECT A, AVG(Cena) as p
+        FROM capuje
+        GROUP BY A
+)
+SELECT c.K, c.A
+FROM capuje c, priemerne_ceny p
+WHERE p.A = c.A AND c.Cena < p.p AND NOT EXISTS (
+    /* neexistuje taky P, ktory vypil c.A niekde drahsie a zaroven ho nevypil v c.K */
+    SELECT n.P
+    FROM navstivil n, vypil v, capuje c2
+    WHERE n.I = v.I AND v.A = c.A AND c2.K = n.K AND c2.A = c.A AND c2.Cena > c.Cena
+        AND NOT EXISTS (
+            SELECT 1 FROM vypil v2, navstivil n2
+            WHERE v2.I = n2.I AND n2.P = n.P AND n2.K = c.K AND v2.A = c.A
+        )
+)
+\end{verbatim}
+\end{problem}
+
+
+\begin{problem}
+Rozšírme záznamy návštev krčiem o začiatok a koniec návštevy, čiže $\navstivil(I, P, K, Od, Do)$. Predpokladáme, že návštevy jedného pijana sa neprekrývajú ani v koncových bodoch. Ak v jednom momente pijan prichádza a iný odchádza, sú v tom momente obaja v krčme.
+
+{\bf Pre každú navštívenú krčmu nájdite maximálny počet pijanov, ktorí v nej boli prítomní naraz.}
+
+\begin{verbatim}
+-- Vsetky casy, v ktorych sa nieco stalo
+vc = (ρ Cas<-Od (π Od navstivil)) ∪ (ρ Cas<-Do (π Do navstivil))
+
+-- vsetky navstevy, ktore obsahuju dany cas pre kazdy cas
+casnavsteva = σ Cas >= Od and Cas <= Do (vc ⨯ navstivil)
+
+caskrcmapocet = γ Cas, K; COUNT(I)->Pocet (casnavsteva)
+γ K; max(Pocet)->Max (caskrcmapocet)
+\end{verbatim}
+
+\begin{verbatim}
+γ K; max(N)→M (γ T, K; count(I)→N ( (navstivil ⨝ T≥Od ∧ T≤Do (ρ Od→T (π Od (navstivil))))))
+\end{verbatim}
+\end{problem}
+
+
+
+\begin{problem}
+Rozšírme záznamy návštev krčiem o začiatok a koniec návštevy, čiže $\navstivil(I, P, K, Od, Do)$. Predpokladáme, že návštevy jedného pijana sa neprekrývajú ani v koncových bodoch.
+
+{\bf V jednej krčme je kvôli koronavírusu možné mať naraz najviac $20$ zákazníkov. Pre každú krčmu zistite súčet dĺžok časových úsekov, počas ktorých bolo toto pravidlo porušené.}
+
+\begin{verbatim}
+WITH okamihy AS (
+    SELECT DISTINCT Cas
+    FROM (
+        SELECT n.Od AS Cas
+        FROM navstivil n
+        UNION
+        SELECT n.Do AS Cas
+        FROM navstivil n
+    )
+),
+najmensie_intervaly AS (
+    -- cely cas rozdeleny na najkratsie zmysluplne disjunktne casove useky
+    SELECT o1.Cas AS Od, o2.Cas AS Do
+    FROM okamihy o1, okamihy o2
+    WHERE o1.Cas < o2.Cas
+    AND NOT EXISTS (
+        SELECT 1
+        FROM okamihy o3
+        WHERE o1.Cas < o3.Cas AND o3.Cas < o2.Cas
+    )
+),
+pocty_v_intervaloch AS (
+    -- kolko ludi bolo medzi Od-Do v Krcme
+    SELECT n.Krcma, i.Od, i.Do, COUNT(n.Id) as Pocet
+    FROM navstivil n, najmensie_intervaly i
+    WHERE n.Od <= i.Od
+    AND n.Do >= i.Do
+    GROUP BY n.Krcma, i.Od, i.Do
+)
+SELECT p.Krcma, SUM(p.Do - p.Od) AS Trvanie
+FROM pocty_v_intervaloch p
+WHERE p.Pocet > 20
+GROUP BY p.Krcma
+\end{verbatim}
+
+\begin{verbatim}
+CREATE TEMPORARY TABLE krcma_intervaly AS (
+	(
+		SELECT	n.K, n.Od AS Int
+		FROM	navstivil AS n
+	)
+	UNION
+	(
+		SELECT	n.K, n.Do AS Int
+		FROM	navstivil AS n
+	)
+);
+
+CREATE TEMPORARY TABLE krcma_ocislovane_interavaly AS(
+	SELECT	ki.K, ki.Int, RANK() OVER (ORDER BY ki.Int) as rank
+	FROM	krcma_intervaly AS ki
+);
+
+CREATE TEMPORARY TABLE krcma_zaciatok_koniec_pocet AS (
+	SELECT	koi1.K, koi1.Int as zac, koi2.Int as kon, COUNT(n.I) as pocet
+	FROM	krcma_ocislovane_intervaly koi1, krcma_ocislovane_intervali koi2 , navstivil AS n
+	WHERE	koi1.K = koi2.K AND koi2.K = n.K AND 
+		koi1.rank = koi2.rank - 1 AND 
+		n.Od <= koi1.Int AND n.Do >= koi2.Int
+	GROUP BY koi1.K, koi1.Int, koi2.Int
+);
+
+SELECT	kzkp.K, SUM(kzkp.kon - kzkp.kon)
+FROM	krcma_zaciatok_koniec_pocet kzkp
+WHERE	kzkp.pocet >=20
+GROUP BY kzkp.K
+\end{verbatim}
+
+\begin{verbatim}
+navstivil_v_case(K,T,P) :- navstivil(_,P,K,Od,Do), Od < T, Do > T.
+navstivilo_v_cas(K,T,C) :- subtotal(navstivil_v_case(K,T,P),[K,T],[C=count(P)]).
+nad_20_v_case(K,T) :- navstivilo_v_cas(K,T,C), C > 20.
+nie_je_najblizsii_odchod(K,Od,Do) :- navstivil(_,_,K,_,T), \+nad_20_v_case(K,T), Od < T, Do > T.
+nad_20_cas(K,C) :- navstivil(_,_,K,Od,_), nad_20_v_case(K,Od), navstivil(_,_,K,_,Do), Od < Do, \+nad_20_v_case(K,Do), \+nie_je_najblizsii_odchod(K,Od,Do), C is Do-Od.
+answer(K,C) :- subtotal(nad_20_cas(K,T),[K],[C=sum(T)]).
+\end{verbatim}
+
+\end{problem}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Zadania (bez agregácie)}
+
+\begin{enumerate}
+\item 
+$EDB = \{osoba(A), pozna(Kto, Koho)\}$
+\begin{itemize}
+    \item osoby, ktoré poznajú sysľa
+    \item osoby, ktoré nepoznajú nikoho (žiadne iné osoby)
+    \item osoby, ktoré majú aspoň dvoch známych (osoby)
+    \item osoby, ktoré pozná presne jedna osoba
+    \item osoby, ktoré poznajú iba Jožka
+    \item osoby, ktoré poznajú všetkých známych svojich známych
+    \item osoby, ktoré majú všetky vzťahy symetrické
+\end{itemize}
+
+\item $EDB = \{integer(X), multiply(X, Y, Result)\}$
+\begin{itemize}
+    \item hodnota $5\cdot 4$
+    \item množina párnych čísel
+    \item množina nepárnych čísel
+    \item dvojice nesúdeliteľných čísel
+\end{itemize}
+
+\item $EDB = \{clovek(Meno), rieka(R), vstupil(Id\_vstupu, Meno, Rieka)\}$
+\begin{itemize}
+    \item ľudia, ktorí nevstúpili dvakrát do tej istej rieky
+    \item ľudia, ktorí do aspoň jednej rieky vstúpili presne raz
+    \item rieky, do ktorých vstupovali najviac dvaja rôzni ľudia
+    \item dvojice [C, R], kde C je človek, ktorý vstúpil do všetkých riek okrem R a do R nie
+\end{itemize}
+
+\item $EDB=\{hodnotenie(Student, Predmet, Znamka)\}$ (dvojice [Student, Predmet] sú unikátne, čiže študent má z daného predmetu najviac jednu známku)
+\begin{itemize}
+    \item študenti, ktorí majú aspoň 3 známky A
+    \item študenti, ktorí boli známkovaní aspoň raz, ale nemajú Fx
+    \item dvojice študentov, ktorí majú rovnaké známky zo všetkých predmetov, na ktorých boli obaja hodnotení
+    \item študenti, ktorí majú z aspoň dvoch predmetov rovnaké známky ako nejaký iný študent
+\end{itemize}
+
+\item
+$EDB = \{blysti(Vec), zlate(Vec)\}$
+\begin{itemize}
+    \item nie je všetko zlato, čo sa blyští    
+    \item veci, ktoré sú zlaté, ale neblyštia sa
+    \item veci, ktoré ani nie sú zlaté, ani sa neblyštia
+\end{itemize}
+
+\item
+$EDB = \{kope(Kto, Komu, Jama), padol(Meno, Jama)\}$
+\begin{itemize}
+    \item všetci, čo druhému jamu kopú, ale sami do nej padli
+    \item tí, čo žiadnu jamu nekopú, ale do nejakej padli
+    \item tí, čo padli do každej jamy, ktorú kopali
+    \item jamy, kto ktorých padol každý, kto nejakú jamu kopal
+\end{itemize}
+
+\item
+$EDB = \{ponuka(Miesto, Akcia), chce(Clovek, Miesto, Akcia)\}$
+\begin{itemize}
+    \item exkluzívne akcie, ktoré sa ponúkajú na jedinom mieste a niekto ich tam chce
+    \item akcie, ktoré sa neponúkajú na žiadnom mieste, kde ich niekto chce, ale niekde inde áno
+    \item akcie, ktoré sa ponúkajú všade, kde ich niekto chce
+    \item miesta, kde sa ponúkajú všetky akcie, ktoré chce vtákopysk
+\end{itemize}
+
+\item $EDB = \{part(Item), component(Item, Subitem)\}$
+\begin{itemize}
+    \item súčiastky, ktoré sú zložené z aspoň dvoch komponentov
+    \item atomické súčiastky (z ničoho sa neskladajú)
+    \item všetky komponenty motora (či už atomické alebo nie)
+    \item atomické súčiastky potrebné na zloženie televízora
+\end{itemize}
+
+\item $EDB = \{citatel(CitatelID, Meno, DatumPrihlasenia), kniha(KnihaID, Nazov, Autor),$\\
+\hspace*{1cm}  $vypozicka(CitatelID, KnihaID, DatumPozicania, DatumVratenia)$\\
+(dátumy sú vyjadrené ako počet sekúnd od 1. 1. 1970; DatumVratenia je null, ak kniha nebola vrátená)
+\begin{itemize}
+    \item trojice [M, K, DatumPozicania], kde K je názov knihy, ktorú čitateľ s menom M ešte nevrátil
+    \item názvy kníh, ktoré si ešte nikto nepožičal
+    \item mená čitateľov, ktorí si už požičali všetky knihy
+    \item mena citateľov, ktorí vrátili všetko, čo si požičali
+    \item dvojice [M, K], kde K je názov knihy, ktorú si čitateľ M požičal práve dvakrát
+    \item dvojice [M, K], kde K je názov knihy, ktoru si čitateľ M požičal skôr ako Pipi Dlhá Pančucha
+    \item čitatelia, ktorí si požičali všetky Haškove knihy z knižnice skôr, než niektorú z nich vrátili
+    \item mená čitateľov, ktorí si požičali aspoň 2 rôzne knihy, pričom všetky ich požičané knihy boli od toho istého autora
+    \item dvojice [M, K], kde K je prvá požičaná kniha daného čitateľa
+    \item mená autorov, ktorých knihu si požičal každý čitateľ (bez duplikátov)
+    \item dvojice [M, N], kde N je počet dní čitateľovej najdlhšej výpožičky (pozor na null)
+    \item čitatelia, ktorí si nepožičali nič v deň, keď sa zaregistrovali, a naraz majú požičanú vždy nanajvýš jednu knihu
+    \item čitatelia, ktori si čítajú knihy \enquote{po autoroch}: ak raz precitaju knihu od nejakého autora, čítajú len knihy tohto autora, až kým neprečítajú všetky jeho knihy, ktoré sú v knižnici
+\end{itemize}
+
+
+
+\item $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item krčmy, kde sa čapuje pivo a nič iné
+    \item krčmy, kde sa pije pivo a nič iné
+    \item pijani, ktorí ľúbia len rum
+    \item pijani, ktorí ľúbia práve jeden alkohol
+    \item pijani-štamgasti, ktorí doteraz navštívili jedinú krčmu
+    \item pijani, ktorí niekedy niekde vypili viac ako pol litra jedného alkoholu
+    \item pijani, ktorí nikdy neodolali rumu (pili ho pri každej návšteve krčmy, v ktorej ho čapujú)
+    \item pijani, ktorí ľúbia aspoň niečo a ľúbia každý alkohol, ktorý je čapovaný v aspoň dvoch krčmách
+    \item pijani, ktorí v aspoň dvoch krčmách ľúbia všetky tam čapované alkoholy
+    \item pijani, ktorí ľúbia aspoň jeden taký alkohol, ktorý čapuje každá krčma, v ktorej ten pijan niečo vypil
+    \item pijani, ktorí pili rum a pili ho v každej krčme, kde ho čapujú, s výnimkou najviac jednej
+    \item pijani, ktorí pri niektorej svojej návšteve krčmy vytvorili doteraz platný rekord v pití vodky v danej krčme
+    \item alkoholy, ktoré ľúbi každý, čo niečo ľúbi (a aspoň niekto), ale nepili sa v každej krčme, čo niečo čapuje a kde sa niečo pilo
+    \item pijanov, ktorí vypili len tie alkoholy, ktoré vypil pijan Felix (t.j. hľadaní pijani vypili nejakú neprázdnu podmnožinu alkoholov,
+            ktoré vypil pijan Felix; a okrem tých alkoholov nevypili žiadne iné)
+    \item alkoholy, pre ktoré platí, že ak ten alkohol niektorý pijan niekedy vypil, tak ho ten pijan vypil pri každej svojej návšteve krčmy
+            (vo výsledku majú byť aj alkoholy, ktoré nikto nikdy nevypil)
+    \item krčmy, pre ktoré platí: hľadanú krčmu nenavštívil žiaden pijan, ktorý ľúbi všetky alkoholy, ktoré tá krčma čapuje (predpokladajte, že každá krčma čapuje nejaký alkohol) 
+    \item všetkých takých pijanov, ktorí neľúbia pivo ani borovičku; a zároveň sa dôsledne vyhýbajú návštevám takým krčiem, v ktorých sa čapuje len pivo alebo borovička;
+            a zároveň nikdy pivo ani borovičku nevypili
+    \item alkoholy, ktoré ľúbia len tí pijani, ktorí nikdy nenavštívili krčmu Wasa
+    \item pijani, ktorí z každého alkoholu A, čo ľúbia, v aspoň jednej krčme aspoň raz vypili na jedno posedenie viac, ako hocikto iný, čo tam niečo pil
+    \item dvojice [P, K] také, že pijan P pri každej návšteve krčmy K vypil niektorý z alkoholov, ktoré ľúbi
+            (pri rôznych návštevách mohol vypiť rôzne obľúbené alkoholy, chceme len dvojice, kde P niekedy navštívil K) 
+    \item dvojice [P, A], ktoré hovoria, ktoré alkoholy A pijan P vypil pri každej svojej návšteve krčmy (abstinenti nemajú byť vo výsledku)
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A, a zároveň každá krčma, v ktorej P vypil A, čapuje alkohol A lacnejšie než ktorákoľvek iná krčma, ktorá čapuje A
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A a ešte také dva ďalšie (navzájom rôzne) alkoholy, že pri každej návšteve krčmy,
+            pri ktorej P vypil A, vypil aj niektorý z týchto dvoch ďalších alkoholov
+    \item dvojice [A, K] také, že alkohol A čapovaný v krčme K vypil (pri aspoň jednej návšteve) každý pijan, ktorý K niekedy navštívil
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A; a v každej krčme, ktorá čapuje alkohol A, vypil P počas niektorej
+            návštevy viacej alkoholu A než ktorýkoľvek iný pijan počas jednej návštevy (teda P je rekordérom v pití A na jedno posedenie v každej krčme, ktorá A čapuje)
+    \item pijanov, ktorí každý akt vypitia alkoholu urobili v jednej z krčiem, kde je ten alkohol najlacnejší (abstinenti nemajú byť vo výsledku)    
+    \item dvojice [K, A] také, že krčma K čapuje alkohol A, a zároveň každý pijan, ktorý ľúbi alkohol A, ho vypil pri niektorej návšteve krčmy K (čiže tú krčmu aj navštívil)
+\end{itemize}
+
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Zadania (s agregáciou)}
+
+\begin{enumerate}
+
+\item $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item pijani, ktorí ľúbia aspoň 10 rôznych alkoholov
+    \item alkoholy, ktoré boli vypité v krčme Stein v celkovom množstve väčšom ako 20
+    \item dvojice [A, Suma], ktoré popisujú množstvo alkoholu A vypitého v krčme Carlton (vo výsledku len tie, čo sa niekedy pili)
+    \item dvojice [P, Pocet], ktoré hovoria, v koľkých krčmách prepil pijan P aspoň 10 EUR počas niektorej (jednej) návštevy
+    \item trojice [P, A, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil alkohol A (netreba nájsť trojice s počtom 0)
+    \item pijani, ktorí sú v niektorej krčme lokálnymi šampiónmi v pití rumu (t.j. hľadaný pijan v aspoň jednej krčme vypil dokopy viacej rumu než ľubovoľný iný pijan)
+    \item dvojice [P, Suma], ktoré hovoria, koľko peňazí pijan P celkovo prepil v krčmách, ktoré čapujú len alkoholy, ktoré P neľúbi (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item trojice [P, nK, nA], kde nK je počet rôznych krčiem, ktoré pijan P navštívil, a nA je počet rôznych alkoholov, ktoré pijan P vypil (nechceme trojice, kde $nK=nA=0$) 
+    \item trojice [K, A, m], kde m je celkové množstvo alkoholu A vypitého v krčme K (chceme vo výsledku každú dvojicu K, A, kde K čapuje A)
+    \item dvojice [K, A] také, že alkohol A sa v krčme K vypil v celkovom množstve väčšom ako 50
+    \item trojice [P, K, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil v krčme K aspoň 5 borovičiek na jedno posedenie (trojice s nulovým počtom nás nezaujímajú)
+    \item dvojice [A, M] také, že M je mediánom ceny alkoholu A cez všetky krčmy, ktoré alkohol A čapujú
+    \item dvojice [K, Suma], ktoré hovoria, koľko peňazí v krčme K celkovo prepili pijani, ktorí tú krčmu navštívili viac než stokrát (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item trojice [P, K, Priemer] ktoré hovoria, koľko peňazí utratil pijan P v priemere pri jednej návšteve krčmy K (trojice s nulovým priemerom nemajú byť vo výsledku)
+    \item všetky dvojice [K, $R$], kde K je krčma, ktorú niekto navštívil,
+        a $R\in [0,1]$ je podiel sklamaných pijanov, čiže podiel počtu pijanov, ktorí K navštívili, ale neľúbia žiaden alkohol, ktorý K čapuje,
+        k celkovému počtu pijanov, ktorí K navštívili
+\end{itemize}
+
+\end{enumerate}
+
+
+\end{document}
+
+\begin{problem}
+{\bf Nájdite krčmy, ktoré už boli navštívené, a chodia do nich výlučne pijani, ktorí pili aspoň
+dvakrát a zakaždým prepijú rovnakú sumu (pri akejkoľvek svojej návšteve ľubovoľnej krčmy).}\\[5mm]
+
+\begin{minipage}{0.49\textwidth}
+\begin{verbatim}
+WITH navstevy AS (
+    SELECT P, SUM(v.M * c.C) AS S
+    FROM n JOIN v ON n.I = v.I
+        JOIN c ON c.K = n.K AND c.A = v.A
+    GROUP BY n.I
+)
+SELECT DISTINCT krcma 
+FROM navstivil AS n1
+WHERE pijan IN (
+    SELECT n.pijan 
+    FROM navstivil AS n 
+        JOIN vypil AS v ON n.id = v.id
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM navstevy n1, navstevy n2
+        WHERE n1.P = n2.P
+        AND n1.P = n.P
+        AND n1.S <> n2.S
+    )
+    GROUP BY n.pijan
+    HAVING COUNT(v.id) >= 2 
+)
+\end{verbatim}
+\end{minipage}
+TODO nie celkom dobre, prerobit
+% \begin{align*}
+%   \text{pcpmad} &\coloneqq ( \pi_{P} \circ \sigma_{COUNT(P) < 2} \circ
+%   \Gamma_{P, COUNT(P)} ) ( \text{navstivil} \bowtie \text{vypil} )
+%   \\ \text{pcnvru} &\coloneqq ( \pi_{P} \circ \sigma_{COUNT(\Sigma(C))
+%     \neq 1} \circ \Gamma_{P, COUNT(\Sigma(C))} \circ \delta \circ
+%   \pi_{P, \Sigma(C)} \circ \Gamma_{P, I, \Sigma(C)} ) (
+%   \text{navstivil} \bowtie \text{vypil} \bowtie \text{capuje} )
+%   \\ \text{answer} &\coloneqq (\delta \circ \pi_{K} ) (
+%   \text{navstivil} \triangleright ( \text{pcpmad} \cup \text{pcnvru} )
+%   )
+% \end{align*}
+\end{problem}
+
+\begin{problem}
+{\bf Zistite tržby v jednotlivých krčmách za predaj najmenej obľúbeného alkoholu (t.\,j. takého, že ho ľúbi najmenej pijanov; predpokladajte, že je len jeden). Vo výsledku uvádzajte len krčmy, ktoré ten alkohol čapujú.}\\[5mm]
+
+TODO neobsahuje nuly
+\begin{align*}
+najmenejludi & = \Gamma_{C=MIN(C)}(\Gamma_{A,C = COUNT(\delta P)}(lubi))\\
+nepopularnyA & = \pi_A(najmenejludi \bowtie (\Gamma_{A,C = COUNT(\delta P)}(lubi)))\\
+nakupy & = capuje \bowtie (nepopularnyA \bowtie (navstivil \bowtie vypil)))\\
+\answer & = \Gamma_{K,SUM(C*M)} (nakupy)
+\end{align*}
+\end{problem}
+
+\begin{problem}
+{\bf Zistite počet pijanov, ktorí už niečo pili a majú presne tie isté chute ako Ignác (t.\,j. ľúbia presne tie isté alkoholy). }\\[5mm]
+
+\begin{align*}
+{\rm alkoholy\_lubi\_Ignac} :=& \Pi_A(\sigma_{P = Ignac}(\lubi))\\
+{\rm alkoholy\_nelubi\_Ignac} :=&  \delta(\Pi_A(\lubi\antijoin {\rm alkoholy\_lubi\_Ignac})\\
+{\rm pijani\_lubia\_nieco\_naviac} :=& \delta(\Pi_P(\lubi\bowtie {\rm alkoholy\_nelubi\_Ignac})))\\
+{\rm pijani\_rovnaky\_pocet\_ako\_Ignac} :=& \Pi_P(\Gamma_{P, C=COUNT(A)}(\lubi) \bowtie \Gamma_{C = COUNT(A)}({\rm alkoholy\_lubi\_Ignac}))\\
+\answer :=& \Gamma_{C=COUNT(P)-1}(\delta(\Pi_P(\navstivil\bowtie \vypil))\bowtie\\
+    & ({\rm pijani\_rovnaky\_pocet\_ako\_Ignac} - {\rm pijani\_lubia\_nieco\_naviac}))\\
+\end{align*}
+
+\def\ctt{\textbf{CREATE TEMPORARY TABLE}}
+\def\select{\textbf{SELECT}}
+\def\from{\textbf{FROM}}
+\def\where{\textbf{WHERE}}
+\def\as{\textbf{AS}}
+\def\distinct{\textbf{DISTINCT}}
+\def\join{\textbf{JOIN}}
+\def\on{\textbf{ON}}
+\def\exists{\textbf{EXISTS}}
+\def\notexists{\textbf{NOT EXISTS}}
+\def\groupby{\textbf{GROUP BY}}
+\def\having{\textbf{HAVING}}
+
+\ctt\ ignacChute \as\ (\\
+\hsp\select\ \distinct A\\
+\hsp\from\ lubi\\
+\hsp\where\ P = `Ignac'\\
+);
+
+\ctt\ pijanicopili \as\ (\\
+\hsp\select\ \distinct\ n.P\\
+\hsp\from\ navstivil n \join\ vypil v \on\ n.I = v.I\\
+);
+
+\ctt\ alkoholyNavyse \as\ (\\
+\hsp\select\ \distinct\ P\\
+\hsp\from\ lubi\\
+\hsp\where\ \notexists\ (\\
+\hsp\hsp\select\ 1\\
+\hsp\hsp\from\ ignacChute\\
+\hsp\hsp\where\ ignacChute.A = lubi.A)\\
+);
+
+\ctt\ rovnakechute \as\ (\\
+\hsp\select\ lubi.P\\
+\hsp\from\ pijanicopili p\\
+\hsp\hsp\join\ lubi \on\ p.P = lubi.P\\
+\hsp\hsp\join\ ignacchute ig \on\ ig.A = lubi.A\\
+\hsp\where\ \notexists\ (\\
+\hsp\hsp\select\ 1 \from\ alkoholyNavyse an\\
+\hsp\hsp\where\ an.P = lubi.P\\
+\hsp\groupby\ lubi.P\\
+\hsp\having\ COUNT(lubi.A) = (\select\ COUNT(*) \from\ ignacChute)\\
+);
+
+\select\ COUNT(*)\\
+\from\ rovnakechute\\
+\end{problem}
+

@@ -1,0 +1,745 @@
+\documentclass[10pt, a4paper]{article}
+
+% DRAFT
+%\usepackage[light,first,bottomafter]{draftcopy}
+
+%\usepackage{changebar}
+
+% slovencina
+\usepackage[activeacute, slovak, english]{babel}
+%\noextrasslovak
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% rozmery stranky
+%\usepackage{a4wide}
+\addtolength{\voffset}{-3cm}
+\addtolength{\hoffset}{-1.5cm}
+\addtolength{\textwidth}{3 cm}
+\addtolength{\textheight}{5 cm}
+\usepackage{array}
+\usepackage{mdwlist}
+
+% fonty pre text a matematiku
+%\usepackage{newcent}
+%\usepackage{euler}
+\usepackage{amsmath}
+
+
+% AMS-TeX
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{amsthm}
+
+\def\ans#1{\big[\hskip 2mm {#1}\hskip 2mm\big]}
+\def\N{\mathbb N}
+\def\Z{\mathbb Z}
+\def\Q{\mathbb Q}
+\def\R{\mathbb R}
+\def\C{\mathbb C}
+
+\begin{document}
+\selectlanguage{slovak}
+
+\addtolength{\parskip}{0.5\baselineskip}
+
+\pagestyle{empty}
+
+
+\section{Relačný kalkul}
+
+Všetky dotazy so všeob. kvantifikátorom následne prepísať cez existenčný.
+
+\begin{enumerate}
+\item 
+$EDB = \{osoba(A), pozna(Kto, Koho)\}$
+\begin{itemize}
+    \item osoby, ktoré poznajú sysľa
+    \item osoby, ktoré nepoznajú nikoho (žiadne iné osoby)
+    \item osoby, ktoré majú aspoň dvoch známych (osoby)
+    \item osoby, ktoré pozná presne jedna osoba
+    \item osoby, ktoré poznajú iba Jožka
+    \item osoby, ktoré majú všetky vzťahy symetrické
+    \item osoby, ktoré medzi Ferovými známymi poznajú aspoň jedného, ale nie všetkých
+    \item osoby, ktoré poznajú všetkých známych svojich známych
+    \item osoby, ktoré poznajú aspoň jedného známeho každého svojho známeho
+\end{itemize}
+
+\item 
+$EDB = \{integer(X), multiply(X, Y, Result)\}$
+\begin{itemize}
+    \item hodnota $5\cdot 4$
+    \item množina párnych čísel
+    \item množina nepárnych čísel
+    \item dvojice nesúdeliteľných čísel
+\end{itemize}
+
+\end{enumerate}
+
+
+\section{Relačný kalkul bez všeob. kvantifikátora, datalog}
+
+% \item {\bf Hra telefón.} Rozdeliť sa do trojíc A, B, C; A si pozrie slovný dotaz napísaný zo zadnej strany na tabuli a prepíše ho do formuly, tú ukáže B a potom ju B prepíše slovami,
+% výsledok ukáže C a ten slová prepíše do výslednej formuly na tabuľu k zadaniu; spolu zhodnotíme, či tie formuly sú správne (mnoho je zle už pre syntaktické chyby, asi tretina bola správna).
+% 
+% Paralelne si na druhej tabuli pozrie B slovný dotaz, prepíše ho do formuly pre C, ten do slov pre A a ten píše formulu na tabuľu.
+% Na začiatku C len sedia, dať im úlohu o kopaní jamy (viď nižšie.)
+
+Syntax a sémantika datalogu (implicitné existenčné kvantifikátory). Význam premennej $\_$.
+
+\begin{enumerate}
+\item
+$EDB = \{blysti(Vec), zlate(Vec)\}$
+\begin{itemize}
+    \item veci, ktoré sú zlaté, ale neblyštia sa
+    \item nie je všetko zlato, čo sa blyští    
+\end{itemize}
+
+\item
+$EDB=\{hodnotenie(Student, Predmet, Znamka)\}$
+\begin{itemize}
+    \item študenti, ktorí majú aspoň 3 známky A
+    \item študenti, ktorí boli hodnotení aspoň raz, ale nemajú Fx
+    \item predmety, z ktorých bol každý študent hodnotený viac ako raz (a aspoň jeden študent bol hodnotený)
+\end{itemize}
+
+\item
+$EDB = \{clovek(Meno), vstupil(Id\_vstupu, Meno, Rieka)\}$
+\begin{itemize}
+    \item ľudia, ktorí nevstúpili dvakrát do tej istej rieky
+    \item rieky, kam vstúpil každý, kto do nejakej rieky vstúpil (a vstúpil do nich aspoň niekto)
+    \item ľudia, ktorí vstúpili do každej rieky presne dvakrát
+\end{itemize}
+
+\item
+$EDB = \{kope(Kto, Komu, Jama), padol(Meno, Jama)\}$
+\begin{itemize}
+    \item všetci, čo druhému jamu kopú, ale sami do nej padli
+    \item tí, čo žiadnu jamu nekopú, ale do nejakej padli
+    \item tí, čo padli do každej jamy, ktorú kopali
+\end{itemize}
+
+\item
+$EDB = \{politik(Meno), cestny(Meno), podplatil(Kto, Koho, Uplatok)\}$
+\begin{itemize}
+    \item všetci politici sú nečestní    
+    \item niektorí nečestní sú politikmi
+    \item politici, ktorí nikdy neprijali uplatok
+    \item politici, ktorí síce nie sú čestní, ale prijímajú len úplatky do 100 
+\end{itemize}
+
+\begin{enumerate}
+\item
+$EDB = \{kozmonaut(Meno, Vek, Stat, Lod)\}$
+\begin{itemize}
+    \item lode, ktoré používal Armstrong alebo Gagarin
+    \item mená a veky kozmonautov, ktorí použili aspoň dve lode
+    \item štáty, ktoré majú práve jedného kozmonauta
+\end{itemize}
+
+\end{enumerate}
+
+
+
+\section{Datalog}
+
+\item 
+$EDB = \{part(Name), component(Item, Subitem, AttachmentType\}$
+\begin{itemize}
+    \item súčiastky, ktoré sú zložené z aspoň dvoch komponentov
+    \item atomické súčiastky (z ničoho sa neskladajú)
+    \item všetky komponenty motora (či už atomické alebo nie)
+    \item atomické súčiastky potrebné na zloženie televízora
+    \item súčiastky, ktoré sú priskrutkované k iným
+\end{itemize}
+
+\item $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item krčmy, kde sa čapuje pivo a nič iné
+    \item krčmy, kde sa pije pivo a nič iné
+    \item pijani, ktorí ľúbia rum a práve jeden iný alkohol
+    \item pijani-štamgasti, ktorí doteraz pili v jedinej krčme
+    \item pijani, ktorí niekedy niekde vypili viac ako pol litra jedného alkoholu
+    \item pijani, ktorí nikdy neodolali rumu (pili ho pri každej návšteve krčmy, v ktorej ho čapujú)
+    \item pijani, ktorí ľúbia aspoň jeden taký alkohol, ktorý čapuje každá krčma, v ktorej ten pijan niečo vypil
+    \item pijani, ktorí pri niektorej svojej návšteve krčmy vytvorili doteraz platný rekord v pití vodky v danej krčme
+    \item pijanov, ktorí vypili len tie alkoholy, ktoré vypil pijan Felix (t.j. hľadaní pijani vypili nejakú neprázdnu podmnožinu alkoholov,
+            ktoré vypil pijan Felix; a okrem tých alkoholov nevypili žiadne iné)
+    \item alkoholy, pre ktoré platí, že ak ten alkohol niektorý pijan niekedy vypil, tak ho ten pijan vypil pri každej svojej návšteve krčmy
+            (vo výsledku majú byť aj alkoholy, ktoré nikto nikdy nevypil)
+    \item krčmy, pre ktoré platí: hľadanú krčmu nenavštívil žiaden pijan, ktorý ľúbi všetky alkoholy, ktoré tá krčma čapuje (predpokladajte, že každá krčma čapuje nejaký alkohol) 
+    \item všetkých takých pijanov, ktorí neľúbia pivo ani borovičku; a zároveň sa dôsledne vyhýbajú návštevám takým krčiem, v ktorých sa čapuje len pivo alebo borovička;
+            a zároveň nikdy pivo ani borovičku nevypili
+    \item alkoholy, ktoré ľúbia len tí pijani, ktorí nikdy nenavštívili krčmu Wasa
+    \item dvojice [P, K] také, že pijan P pri každej návšteve krčmy K vypil niektorý z alkoholov, ktoré ľúbi
+            (pri rôznych návštevách mohol vypiť rôzne obľúbené alkoholy, chceme len dvojice, kde P niekedy navštívil K) 
+    \item dvojice [P, A], ktoré hovoria, ktoré alkoholy A pijan P vypil pri každej svojej návšteve krčmy (abstinenti nemajú byť vo výsledku)
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A, a zároveň každá krčma, v ktorej P vypil A, čapuje alkohol A lacnejšie než ktorákoľvek iná krčma, ktorá čapuje A
+    \item dvojice [K, A] také, že krčma K čapuje alkohol A, a zároveň každý pijan, ktorý ľúbi alkohol A, ho vypil pri niektorej návšteve krčmy K
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A a ešte také dva ďalšie (navzájom rôzne) alkoholy, že pri každej návšteve krčmy,
+            pri ktorej P vypil A, vypil aj niektorý z týchto dvoch ďalších alkoholov
+    \item dvojice [A, K] také, že alkohol A čapovaný v krčme K vypil (pri aspoň jednej návšteve) každý pijan, ktorý K niekedy navštívil
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A; a v každej krčme, ktorá čapuje alkohol A, vypil P počas niektorej
+            návštevy viacej alkoholu A než ktorýkoľvek iný pijan počas jednej návštevy (teda P je rekordérom v pití A na jedno posedenie v každej krčme, ktorá A čapuje)
+    \item pijanov, ktorí každý akt vypitia alkoholu urobili v jednej z krčiem, kde je ten alkohol najlacnejší (abstinenti nemajú byť vo výsledku)    
+\end{itemize}
+
+\end{enumerate}
+
+
+
+\section{cvičenie: datalog, SQL}
+
+\begin{enumerate}
+\item {\bf Rozcvička.} $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item datalog
+    \item dvojice [K, A] také, že krčma K čapuje alkohol A, a zároveň každý pijan, ktorý ľúbi alkohol A, ho vypil pri niektorej návšteve krčmy K (čiže tú krčmu aj navštívil)
+\end{itemize}
+
+\item SQL; $EDB=\{hodnotenie(Student, Predmet, Znamka)\}$
+\begin{itemize}
+    \item študenti, ktorí dostali aspoň jedno A
+    \item študenti, ktorí dostali aspoň jedno A a nedostali Fx
+    \item študenti, ktorí dostali A aspoň z troch predmetov [využiť agregáciu]
+\end{itemize}
+
+\item úloha z rozcvičky  
+\begin{itemize}
+    \item zapísať datalog (dobrovoľník nejaký)
+    \item strojový preklad z datalogu do SQL vysvetliť (ja)
+\end{itemize}
+
+\item SQL
+$EDB = \{kope(Kto, Komu, Jama), padol(Meno, Jama)\}$
+\begin{itemize}
+    \item všetci, čo druhému jamu kopú, ale sami do nej padli
+    \item tí, čo žiadnu jamu nekopú, ale do nejakej padli
+    \item tí, čo padli do každej jamy, ktorú kopali
+\end{itemize}
+
+\end{enumerate}
+
+
+
+
+\section{cvičenie: SQL, relačná algebra}
+
+\begin{enumerate}
+\item {\bf Rozcvička.} $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item datalog
+    \item krčmy K, ktoré navštívil aspoň jeden pijan, ktorý ľúbi všetky alkoholy, ktoré K čapuje (predpokladajte, že každá krčma čapuje nejaký alkohol) 
+\end{itemize}
+
+\item
+$EDB = \{osoba(A), pozna(Kto, Koho)\}$
+\begin{itemize}
+    \item osoby, ktoré poznajú sysľa
+    \item osoby, ktoré nepoznajú nikoho a nič (nielen osoby)
+    \item osoby, ktoré majú aspoň štyri známe osoby
+    \item osoby, ktoré pozná presne jedna entita
+    \item osoby, ktoré poznajú iba Jožka
+    \item osoby, ktoré poznajú všetkých známych svojich známych
+\end{itemize}
+
+\item vyriešiť rozcvičku (datalog, SQL, algebra)
+
+Relačná algebra; nad multimnožinami:
+\begin{itemize}
+\item $\cup$ zjednotenie
+\item $\cap$ prienik
+\item $-$ rozdiel
+\item $\varrho$ premenovanie (stĺpcov)
+\item $\times$ karteziánsky súčin (počet stĺpcov vo výsledku je súčtom počtov stĺpcov operandov)
+\item $\pi_X(r)$ projekcia; $X$ je množina atribútov, ktoré ostanú, ostatné sa zahodia
+\item $\sigma_{c(X)}(r)$ selekcia; vyberie riadky, ktoré spĺňajú podmienku $c(X)$
+\item $r_1 \bowtie r_2$ natural join
+\item $r_1 \bowtie_c r_2$ theta-join = selekcia aplikovaná na karteziánsky súčin
+\item $\delta$ eliminácia duplikátov
+\item $\Gamma$ grupovanie a agregácia, napr. $\Gamma_{A, B, AVG(C)}(r)$
+\item $T$ triedenie
+\item $OUTERJOIN$
+\end{itemize}
+zápisy: jediný výraz / postupné priradzovanie do pomenovaných relácií / strom výpočtu
+\end{enumerate}
+
+
+
+\section{cvičenie: Datalog, SQL, relačná algebra}
+
+\begin{enumerate}
+\item {\bf Rozcvička.} $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item relačná algebra, SQL
+    \item alkoholy, ktoré čapuje krčma Stein, ale nikdy ich tam nik nepil
+\end{itemize}
+
+\item agregácia pijanov: datalog, SQL
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item pijani, ktorí ľúbia aspoň 10 rôznych alkoholov
+    \item alkoholy, ktoré boli vypité v krčme Stein v celkovom množstve väčšom ako 20
+    \item dvojice [A, Suma], ktoré popisujú množstvo alkoholu A vypitého v krčme Carlton (vo výsledku len tie, čo sa niekedy pili)
+    \item dvojice [P, Pocet], ktoré hovoria, v koľkých krčmách prepil pijan P aspoň 10 EUR počas niektorej (jednej) návštevy
+    \item trojice [P, A, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil alkohol A (netreba nájsť trojice s počtom 0)
+    \item pijani, ktorí sú v niektorej krčme lokálnymi šampiónmi v pití rumu (t.j. hľadaný pijan v aspoň jednej krčme vypil dokopy viacej rumu než ľubovoľný iný pijan)
+    \item dvojice [P, Suma], ktoré hovoria, koľko peňazí pijan P celkovo prepil v krčmách, ktoré čapujú len alkoholy, ktoré P neľúbi (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item [P, nK, nA], kde nK je počet rôznych krčiem, ktoré pijan P navštívil, a nA je počet rôznych alkoholov, ktoré pijan P vypil (nechceme trojice, kde $nK=nA=0$) 
+    \item [K, A, m], kde m je celkové množstvo alkoholu A vypitého v krčme K (chceme vo výsledku každú dvojicu K, A, kde K čapuje A)
+\end{itemize}
+
+\item agregácia pijanov: datalog, SQL
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item dvojice [K, A] také, že alkohol A sa v krčme K vypil v celkovom množstve väčšom ako 50
+    \item trojice [P, K, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil v krčme K aspoň 5 borovičiek na jedno posedenie (trojice s nulovým počtom nás nezaujímajú)
+    \item dvojice [A, M] také, že M je mediánom ceny alkoholu A cez všetky krčmy, ktoré alkohol A čapujú
+    \item dvojice [K, Suma], ktoré hovoria, koľko peňazí v krčme K celkovo prepili pijani, ktorí tú krčmu navštívili viac než stokrát (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item trojice [P, K, Priemer] ktoré hovoria, koľko peňazí utratil pijan P v priemere pri jednej návšteve krčmy K (trojice s nulovým priemerom nemajú byť vo výsledku)
+\end{itemize}
+
+\end{enumerate}
+
+
+\newpage
+
+\section{cvičenie: Datalog, SQL, relačná algebra}
+
+\begin{enumerate}
+\item {\bf Rozcvička.} $EDB=\{capuje(Krcma, Alkohol)$
+\begin{itemize}
+    \item SQL
+    \item dvojice [K, $n$] také, že v krčme K sa čapuje $n$ alkoholov s cenou vyššou ako je priemerná cena (cez všetky krčmy, ktoré ich čapujú)
+\end{itemize}
+
+\item agregácia pijanov: datalog, SQL
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item trojice [P, A, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil alkohol A (netreba nájsť trojice s počtom 0)
+    \item trojice [P, K, Priemer] ktoré hovoria, koľko peňazí utratil pijan P v priemere pri jednej návšteve krčmy K (trojice s nulovým priemerom nemajú byť vo výsledku)
+    \item pijani, ktorí sú v niektorej krčme lokálnymi šampiónmi v pití rumu (t.j. hľadaný pijan v aspoň jednej krčme pil aspoň raz a vypil dokopy aspoň toľko rumu ako ľubovoľný iný pijan)
+    \item pijani, ktorí sú v každej krčme lokálnymi šampiónmi v pití rumu (t.j. hľadaný pijan v aspoň jednej krčme pil aspoň raz a vypil dokopy aspoň toľko rumu ako ľubovoľný iný pijan)
+    \item dvojice [P, Suma], ktoré hovoria, koľko peňazí pijan P celkovo prepil v krčmách, ktoré čapujú len alkoholy, ktoré P neľúbi (dvojice s nulovou sumou nemajú byť vo výsledku)
+
+    
+    \item pijani, ktorí ľúbia aspoň 10 rôznych alkoholov
+    \item alkoholy, ktoré boli vypité v krčme Stein v celkovom množstve väčšom ako 20
+    \item dvojice [A, Suma], ktoré popisujú množstvo alkoholu A vypitého v krčme Carlton (vo výsledku len tie, čo sa niekedy pili)
+    \item dvojice [P, Pocet], ktoré hovoria, v koľkých krčmách prepil pijan P aspoň 10 EUR počas niektorej (jednej) návštevy
+    \item{} [P, nK, nA], kde nK je počet rôznych krčiem, ktoré pijan P navštívil, a nA je počet rôznych alkoholov, ktoré pijan P vypil (nechceme trojice, kde $nK=nA=0$) 
+    \item{} [K, A, m], kde m je celkové množstvo alkoholu A vypitého v krčme K (chceme vo výsledku každú dvojicu K, A, kde K čapuje A)
+\end{itemize}
+
+\item agregácia pijanov: datalog, SQL
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item dvojice [K, A] také, že alkohol A sa v krčme K vypil v celkovom množstve väčšom ako 50
+    \item trojice [P, K, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil v krčme K aspoň 5 borovičiek na jedno posedenie (trojice s nulovým počtom nás nezaujímajú)
+    \item dvojice [A, M] také, že M je mediánom ceny alkoholu A cez všetky krčmy, ktoré alkohol A čapujú
+    \item dvojice [K, Suma], ktoré hovoria, koľko peňazí v krčme K celkovo prepili pijani, ktorí tú krčmu navštívili viac než stokrát (dvojice s nulovou sumou nemajú byť vo výsledku)
+\end{itemize}
+
+\item pojmy:
+\begin{itemize}
+    \item funkčná závislosť $X\to Y$
+\end{itemize}
+
+
+\item nájdite funkčné závislosti v reláciách:\\
+    (meno, rodné číslo, ulica, mesto, kraj, PSČ, telefónne číslo)\\
+    (moleculeId, x, y, z, vx, vy, vz)
+
+\end{enumerate}
+
+
+\newpage
+
+
+\section{cvičenie: funkčné závislosti, kľúče}
+
+\begin{enumerate}
+\item {\bf Rozcvička.} $EDB=\{lubi(P, A), capuje(K, A),$\\
+\hspace*{1cm} $navstivil(Id, P, K), vypil(Id, A, Mnozstvo)\}$
+\begin{itemize}
+    \item datalog, SQL
+    \item všetky dvojice [K, $R$], kde K je krčma, ktorú niekto navštívil,
+        a $R\in [0,1]$ je podiel sklamaných pijanov, čiže podiel počtu pijanov, ktorí K navštívili, ale neľúbia žiaden alkohol, ktorý K čapuje,
+        k celkovému počtu pijanov, ktorí K navštívili
+\end{itemize}
+
+\item Armstrongove axiómy
+\begin{enumerate}
+    \item $X\subseteq Y \implies Y\to X$
+    \item $X\to Y \implies XZ\to YZ$
+    \item $X\to Y \wedge Y\to Z\implies X\to Z$
+\end{enumerate}
+
+\item \emph{uzáver $X^+$ množiny atribútov $X$} vzhľadom na množinu funkčných závislostí $F$: množina všetkých atribútov $Y$ takých, že $X\to Y$ sa dá odvodiť z $F$
+\begin{itemize}
+    \item algoritmus: vezmeme $X^+ := X$ a postupne prechádzame všetky závislosti v $F$;
+        ak závislosť odvodí nové atribúty, pridáme ich do $X^+$ a závislosť zahodíme (nič nové sa z nej už nebude dať odvodiť);
+        ak sa už nedá použiť žiadna zo zvyšných závislostí, končíme
+\end{itemize}
+
+\item Nájdite $\{EF\}^+$ vzhľadom na ${\cal F}=\{BE\to GH, BEG\to F, AD\to C, F\to B, BF\to A\}$.
+
+\item \emph{uzáver ${\cal F}^+$ množiny funkčných závislostí ${\cal F}$} je množina funkčných závislostí, ktoré sú dôsledkom ${\cal F}$, t.j. dajú sa odvodiť pomocou Armstrongových axióm
+\begin{itemize}
+    \item stačí uvádzať \emph{maximálne} funkčné závislosti, t.j. kde sa nedá vynechať atribút z ľavej strany ani pridať atribút na pravú stranu bez porušenia platnosti
+\end{itemize}
+
+\item množina funkčných závislostí ${\cal G}$ \emph{pokrýva} množ. funkčných závislostí ${\cal F}$, ak ${\cal F}^+\subseteq {\cal G}^+$
+\begin{itemize}
+    \item algoritmus: otestujeme, či každú závislosť v ${\cal F}$ vieme odvodiť z ${\cal G}$
+    \item test pre jednu závislosť: overíme, či pravá strana závislosti je podmnožinou uzáveru ľavej strany vzhľadom na ${\cal G}$
+\end{itemize}
+
+\item minimálne pokrytie množiny funkčných závislostí ${\cal F}$ je množina kanonických funkčných závislostí ${\cal G}$ taká,
+    že ${\cal F}$ a ${\cal G}$ sa navzájom pokrývajú a pri vynechaní ľubovoľnej závislosti z ${\cal G}$
+    alebo ľubovoľného atribútu z ľavej strany takej závislosti už ${\cal G}$ prestane byť pokrytím ${\cal F}$ 
+\begin{itemize}
+    \item \emph{kanonická} funkčná závislosť: na pravej strane práve jeden atribút
+    \item minimálnych pokrytí môže existovať viac
+    \item algoritmus:
+        \begin{enumerate}
+            \item rozbitie pravých strán (nahradenie $X\to Y$ množinou $\{X\to A, A\in Y\}$)
+            \item vynechanie redundantných atribútov na ľavých stranách (každý atribút z ľavej strany otestovať raz, počítame uzáver ľavej strany s vynechaným atribútom vzhľadom na $F$)
+            \item vynechanie redundantných závislostí (vezmeme ľavú stranu závislosti $\alpha$ a počítame jej uzáver vzhľadom na $F-\{\alpha\}$, ak obsahuje pravú stranu, závislosť možno vynechať)
+        \end{enumerate}
+\end{itemize}
+
+\item Nájdite minimálne pokrytie množiny ${\cal F}=\{BE\to GH, BEG\to F, AD\to C, F\to B, BF\to A\}$ pre reláciu $r(A, B, C, D, E, F, G)$.
+
+\item nech $r$ je relácia nad množinou atribútov $U$; \emph{nadkľúč} je množina atribútov $K$ taká, že $K\to U$; \emph{kľúč} je nadkľúč minimálny vzhľadom na inklúziu
+\begin{itemize}
+    \item algoritmus hľadania kľúčov zhora nadol
+        \begin{enumerate}
+            \item vezmeme najprv množinu všetkých atribútov a pokúšame sa z nej postupne odstrániť jednotlivé atribúty
+            \item podčiarknutý atribút: nachádza sa v každom kľúči
+            \item atribúty, ktoré nie sú na pravej strane žiadnej závislosti, sú automaticky podčiarknuté
+            \item atribúty, ktoré nie sú na ľavej strane žiadnej závislosti, ale sú na pravej strane, môžeme úplne vynechať, lebo nebudú v žiadnom kľúči
+            \item kreslíme strom (pre atribút $X$, ktorý nie je podčiarknutý: ľavá vetva neobsahuje $X$, pravá obsahuje $X$)
+            \item pri prehľadávaní:
+                \begin{itemize}
+                    \item Pred prehľadávaním stromu vypočítaj uzáver z množiny podčiarknutých atribútov --- ak sú podčiarknuté atribúty nadkľúčom, tak to je kľúč (ukonči vetvu)
+                    \item V ľavej vetve over, či uzáver naďalej obsahuje ten atribút, ktorý sa v tej vetve vynecháva (ak nie, ukonči vetvu)
+                    \item Po nájdení nejakého kľúča neprehľadávaj podstromy, ktoré ten kľúč obsahujú
+                \end{itemize}
+        \end{enumerate}
+\end{itemize}
+
+\item Nájdite všetky nadkľúče pre relačnú schému $r(A, B, C, D, E, F, G)$,\\
+${\cal F}=\{ABCD\to EF, ABE\to FG, ABDG\to CF, G\to BD\}$.
+
+\item Uvažujme relačnú schému $r(A, B, C, D, E)$,\\
+${\cal F}=\{A\to CE, ACD\to BE, BC\to D, BE\to AC\}$.
+\begin{itemize}
+    \item[(a)] Nájdite minimálne pokrytie ${\cal F}$.
+    \item[(b)] Nájdite všetky kľúče $r$.
+\end{itemize}
+
+\item medián v SQL a datalogu: dvojice [P, $m$], kde $m$ je medián počtu čapovaných alkoholov, ktoré pijan P ľúbi (cez všetky krčmy)
+\end{enumerate}
+
+
+\section{cvičenie: funkčné závislosti, kľúče, dekompozícia do normálnych foriem}
+
+\begin{itemize}
+\item {\bf Rozcvička.} Dokážte, že ${\cal F} = \{A\to B, A\to C, A\to D, A\to E, BI \to J\}$ je pokrytím ${\cal G} = \{A\to B C E, A B\to D E, B I\to J\}$.
+Rozhodnite, či existuje $\varphi\in {\cal F}$ tak, že ${\cal G}^+\not\subseteq ({\cal F}\setminus\{\varphi\})^+$.
+
+\item
+Relačná schéma $(r, F)$ je v \emph{tretej normálnej forme} (3NF),
+ak pre každú platnú netriviálnu (takú, že ľavá strana sa nedá
+skrátiť) funkčnú závislosť $X\to Y$ platí, že buď $X$ je nadkľúč v $r$
+alebo $Y$ je časťou nejakého kľúča v $r$.
+
+\item
+Relačná schéma $(r, F)$ je v \emph{Boyce-Coddovej normálnej
+forme} (BCNF), ak pre každú platnú netriviálnu funkčnú závislosť
+$X\to Y$ platí, že $X$ je nadkľúč v $r$
+
+\item 
+Dekompozícia do 3NF zachovávajúca funkčné závislosti
+
+Vstup: Relačná schéma r a minimálne pokrytie závislostí F
+
+Výstup: Relačné schémy bestratovej dekompozície do 3NF, pričom všetky funkčné závislosti ostanú zachované
+
+Dekompozícia do 3NF zachovávajúca funkčné závislosti:
+
+Ak F obsahuje závislosť, ktorá obsahuje všetky atribúty r, potom r je už v 3NF
+
+Inak každej funkčnej závislosti v F zodpovedá jedna relačná
+schéma
+
+Ak je niektorá podschéma podmnožinou inej, treba ju vynechať
+
+Ak žiadna z tých relačných podschém neobsahuje kľúč r, treba
+ešte pridať schému s nejakým kľúčom. (Testovanie, či podschéma
+obsahuje nejaký kľúč r, nevyžaduje výpočet kľúčov. Stačí overiť, či
+atribúty niektorej podschémy sú nadkľúčom v r. Ak áno, tak tá
+podschéma obsahuje nejaký kľúč r, inak neobsahuje.)
+
+\item
+Algoritmus dekompozície relácie R do BCNF (je prirodzené začať
+s dobrou 3NF dekompozíciou):
+
+1. Dekomponuj r do 3NF so zachovaním funkčných závislostí.
+
+2. Over, či každá relácia dekompozície je v BCNF. Ak nie, nájdi v
+nej funkčnú závislosť $X\to Y$ ktorá porušuje BCNF a
+dekomponuj reláciu ri do dvoch relácií, $r_i - Y$ a $XY$.
+
+3. Opakuj overovanie a rozkladanie až kým sú všetky relácie v
+BCNF.
+
+\item chase
+1. Vyrob maticu S s 1 riadkom pre každú podreláciu $r_1, \dots, r_m$
+a s 1 stĺpcom pre každý atribút r
+
+2. Nastav počiatočné hodnoty, $S[i, j] := b_{i,j}$
+
+3. for (i = 1...m)
+for (j = 1...n)
+if (atribút $A_j$ patrí do $r_i$) then $S[i, j] := a_j$
+
+4. Opakuj kým matica mení:
+for all ($X\to Y \in F$)
+for (všetky dvojice riadkov s rovnakými symbolmi v tých stĺpcoch, ktoré
+zodpovedajú atribútom v X)
+Zjednoť riadky v tých 2 riadkoch, pritom preferuj symboly a*.
+
+5. Ak jeden riadok obsahuje len symboly a*, rozklad je bezstratový, inak nie.
+
+
+\item
+Pre danú relačnú schému $r$ a množinu funkčných závislostí ${\cal F}$:
+\begin{itemize}
+    \item[(a)] Nájdite všetky kľúče $r$.
+    \item[(b)] Nájdite minimálne pokrytie ${\cal F}$.
+    \item[(c)] Zo zostrojeného minimálneho pokrytia vytvorte dekompozíciu do 3NF zachovávajúcu závislosti.
+    \item[(d)] Použite chase a dokážte, že vytvorená dekompozícia sa spája bezstratovo.
+    \item[(e)] Rozhodnite, či je vytvorená dekompozícia v BCNF.
+\end{itemize}
+\begin{enumerate}
+    \item TODO preratat alebo vymenit zadanie
+    \item $r(A, B, C, D, E, F, G)$, ${\cal F}=\{AB\to C, ACEF\to G, BC\to AD, D\to E, DE\to F, DF\to C, F\to DE, G\to F\}$; [kluce: AB, BC, BD, BF, BG]
+    \item $r(A, B, C, D, E, F, G, H)$ s funkčnými závislosťami $BE\to GH, BEG\to FA, D\to C, F\to B, BF\to A$.
+    \item $r(A, B, C, D, E, F, G, H)$, ${\cal F}=\{BF\to ACG, C\to AE, AH\to F, AF\to H, BG\to F, E\to G, BCE\to F, GH\to AF, H\to D\}$
+\end{enumerate}
+
+% \item domáca úloha na mierne zlepšenie hodnotenia: máme $r(X)$, nájdite medián $X$; nájdite reláciu v BCNF, ktorá obsahuje atribúty A, B také, že r-AB\to A (vid tu podmienku v algoritme)
+
+\end{itemize}
+
+\section{cvičenie: funkčné závislosti, kľúče, dekompozícia do normálnych foriem}
+
+\begin{itemize}
+
+\item mal plachetka
+\end{itemize}
+
+\newpage
+
+\section{cvičenie: transakcie}
+
+\begin{itemize}
+\item rozcvička: nájdite minimálne pokrytie a zostrojte z neho bezstratovú dekompozíciu do 3NF, ktorá zachováva funkčné závislosti:\\
+$r(A, B, C, D, E, F, G, H)$ s funkčnými závislosťami $BE\to GH, BEG\to FA, D\to C, F\to B, BF\to A$.
+
+\item
+\begin{itemize}
+    \item v rozvrhu sú dve operácie \emph{konfliktné}, ak patria rôznym
+    transakciám, ich operandom je rovnaký objekt a aspoň jedna z
+    tých operácií je write
+
+    \item dva rozvrhy sú konflikt-ekvivalentné práve vtedy, ak
+    pozostávajú z rovnakých operácií a
+    relatívne poradie každých dvoch konfliktných operácií je rovnaké
+    v oboch históriách
+
+    \item rozvrh je \emph{sériový} práve vtedy, ak je kompletný (t.j.
+    každá transakcia v tom rozvrhu končí commitom alebo abortom) a
+    pre každú dvojicu transakcií T1, T2 platí, že buď všetky operácie
+    T1 v tom rozvrhu predchádzajú operáciám T2 alebo naopak
+
+    \item rozvrh je \emph{konflikt-sériovateľný} práve vtedy, ak jeho
+    projekcia na commitované transakcie je konflikt-ekvivalentná
+    niektorému sériovému rozvrhu tých commitovaných transakcií
+
+    \item {\sl Rozvrh je konflikt-sériovateľný práve vtedy, ak jeho
+    precedenčný graf je acyklický. Topologické
+    usporiadanie jeho precedenčného grafu hovorí ktorému
+    sériovému rozvrhu je ten rozvrh ekvivalentný.}
+\end{itemize}
+
+\item rozhodnite, či sú rozvrhy konflikt-sériovateľné
+\begin{enumerate}
+    \item r1(X), w1(X), r3(Y), r2(X), r1(Y), w2(Y), w3(X)
+    \item r1(X), w1(X), r2(Y), w2(Y), r3(Y), r2(X), r1(Y), w3(X)
+\end{enumerate}
+
+
+\item 
+\begin{itemize}
+\item \emph{transakcia T2 číta X od
+transakcie T1}, ak v tom rozvrhu existuje operácia w1(X) a neskôr
+operácia r2(X), pričom T1 je v čase operácie r2(X) stále aktívna
+(neukončená)
+
+\item
+dva rozvrhy H a H' sú \emph{view-ekvivalentné}, ak (sú
+definované nad tými istými transakciami a zároveň)
+(1) pre každú dvojicu operácií v H, kde nejaká transakcia T1 číta X
+od T2 existuje taká istá dvojica operácií v H', kde T1
+tiež číta X od
+T2, a zároveň
+(2) pre každý dátový objekt X, ak transakcia Ti
+je posledná
+transakcia ktorá píše do X v H, tak aj v H' je Ti
+je posledná
+transakcia ktorá píše do X (final write)
+(Intuitívne, rozvrhy sú view-ekvivalentné, ak majú rovnaký efekt.)
+
+\item rozvrh je \emph{view-sériovateľný}, ak commitovaná projekcia
+každého jeho prefixu je view-ekvivalentná niektorému
+sériovému rozvrhu
+\end{itemize}
+
+\item  rozhodnite, či nasledujúce rozvrhy sú konflikt-sériovateľný a view-sériovateľný
+\begin{enumerate}
+    \item r3(b), w3(b), w4(b), r2(b), r1(a), r1(c), w1(a), w1(c), r3(a), w3(c), r2(a), w3(c)
+    \item r1(a), r1(b), w1(a), r3(a), r2(b), w3(c), r2(c), w2(b), r1(a), w3(a), w2(c), w2(a)
+    \item r3(Z), w3(X), w1(Z), w2(X), r2(Z), r2(Y),w1(X), w3(Z), w1(Y), c1, r3(X), c2, c3 
+\end{enumerate}
+
+\item dvojfázové zamykanie: transakcia musí na čítanie i písanie vlastniť zámok; po uvoľnení nejakého zámku už nesmie o iný požiadať; read lock môže mať viac transakcií zároveň, write lock je úplne exkluzívny
+
+\item vytvorte rozvrh pre nasledujúce transakcie, overte, že je konflikt-sériovateľný, a nájdite ekvivalentný sériový rozvrh:
+T1: r(X), w(X), r(Y), c
+T2: r(Y), w(Y), r(X), c
+T3: r(Y), w(X), c
+
+\item 
+Uveďte príklad rozvrhu, v ktorom všetky transakcie končia commitom, a ktorý
+je konflikt-sériovateľný a nedá sa generovať dvojfázovým zamykaním [r1(X), r2(X), w1(X), c1, c2]
+
+
+\end{itemize}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\item $EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item pijani, ktorí vypili aspoň dva rôzne alkoholy
+    \item krčmy, kde sa čapuje pivo a nič iné
+    \item krčmy, kde sa pije pivo a nič iné
+    \item pijani, ktorí ľúbia len rum
+    \item pijani, ktorí ľúbia práve jeden alkohol
+    \item pijani-štamgasti, ktorí doteraz navštívili jedinú krčmu
+    \item pijani, ktorí niekedy niekde vypili viac ako pol litra jedného alkoholu
+    \item pijani, ktorí nikdy neodolali rumu (pili ho pri každej návšteve krčmy, v ktorej ho čapujú)
+    \item pijani, ktorí ľúbia aspoň jeden taký alkohol, ktorý čapuje každá krčma, v ktorej ten pijan niečo vypil
+    \item pijani, ktorí pri niektorej svojej návšteve krčmy vytvorili doteraz platný rekord v pití vodky v danej krčme
+    \item pijanov, ktorí vypili len tie alkoholy, ktoré vypil pijan Felix (t.j. hľadaní pijani vypili nejakú neprázdnu podmnožinu alkoholov,
+            ktoré vypil pijan Felix; a okrem tých alkoholov nevypili žiadne iné)
+    \item alkoholy, ktoré boli vypité v krčme Stein v celkovom množstve väčšom ako 20
+    \item alkoholy, pre ktoré platí, že ak ten alkohol niektorý pijan niekedy vypil, tak ho ten pijan vypil pri každej svojej návšteve krčmy
+            (vo výsledku majú byť aj alkoholy, ktoré nikto nikdy nevypil)
+    \item krčmy K, ktoré nenavštívil žiaden pijan, ktorý ľúbi všetky alkoholy, ktoré tá krčma čapuje (predpokladajte, že každá krčma čapuje nejaký alkohol) 
+    \item všetkých takých pijanov, ktorí neľúbia pivo ani borovičku; a zároveň sa dôsledne vyhýbajú návštevám takým krčiem, v ktorých sa čapuje len pivo alebo borovička;
+            a zároveň nikdy pivo ani borovičku nevypili
+    \item alkoholy, ktoré ľúbia len tí pijani, ktorí nikdy nenavštívili krčmu Wasa
+    \item dvojice [P, K] také, že pijan P pri každej návšteve krčmy K vypil niektorý z alkoholov, ktoré ľúbi
+            (pri rôznych návštevách mohol vypiť rôzne obľúbené alkoholy, chceme len dvojice, kde P niekedy navštívil K) 
+    \item dvojice [Pijan, Alkohol], ktoré hovoria, ktoré alkoholy ten pijan vypil pri každej svojej návšteve krčmy (abstinenti nemajú byť vo výsledku)
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A, a zároveň každá krčma, v ktorej P vypil A, čapuje alkohol A lacnejšie než ktorákoľvek iná krčma, ktorá čapuje A
+    \item dvojice [K, A] také, že krčma K čapuje alkohol A, a zároveň každý pijan, ktorý ľúbi alkohol A, ho vypil pri niektorej návšteve krčmy K
+    \item trojice [P, A1, A2] také, že pijan P ľúbi oba rôzne alkoholy A1, A2; a zároveň pri každej návšteve krčmy vypil práve jeden z týchto alkoholov
+    \item trojice [P1, P2, K] také, že pijani P1 aj P2 krčmu K niekedy navštívili, ale (nikdy) v K nevypili (žiaden) alkohol, ktorý obaja ľúbia
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A a ešte také dva ďalšie (navzájom rôzne) alkoholy, že pri každej návšteve krčmy,
+            pri ktorej P vypil A, vypil aj niektorý z týchto dvoch ďalších alkoholov
+    \item dvojice [A, K] také, že alkohol A čapovaný v krčme K vypil (pri aspoň jednej návšteve) každý pijan, ktorý K niekedy navštívil
+    \item dvojice [P, A] také, že pijan P ľúbi alkohol A; a v každej krčme, ktorá čapuje alkohol A, vypil P počas niektorej
+            návštevy viacej alkoholu A než ktorýkoľvek iný pijan počas jednej návštevy (teda P je rekordérom v pití A na jedno posedenie v každej krčme, ktorá A čapuje)
+    \item trojice [A, K1, K2] také, že alkohol A sa čapuje v krčme K1 aj K2; a zároveň každý pijan, ktorý ľúbi alkohol A, vypil A v K1 aj v K2
+    \item dvojice pijanov [P1, P2], o ktorých platí, že P1 ľúbi niektorý z alkoholov, ktorý P2 vypil v aspoň troch rôznych krčmách;
+            a súčasne P1 nikdy nevypil žiaden z alkoholov, ktoré vypil P2
+    \item dvojice [P, K] o ktorých platí, že pijan P navštívil krčmu K práve trikrát, pričom pri každej z tých troch návštev vypil 1 pivo a 1 borovičku a nič iné
+    \item trojice [P, A1, A2] také, že pijan P ľúbi aspoň jeden z alkoholov A1 a A2 a pri každej svojej návšteve krčmy Feuerstein oba tie alkoholy (A1 aj A2) vypil
+    \item pijanov, ktorí každý akt vypitia alkoholu urobili v jednej z krčiem, kde je ten alkohol najlacnejší (abstinenti nemajú byť vo výsledku)    
+\end{itemize}
+
+
+\item pijani s evidenciou casu navstev
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma, Od), vypil(Id, Alkohol, Mnozstvo)\}$  (Atribút Od je čas, kedy návšteva začala.)
+\begin{itemize}
+\item \emph{Držgroš} je pijan, ktorý si pri každej návšteve krčmy všimne a zapamätá ceny
+všetkých alkoholov, ktoré tá krčma čapuje. Pri návšteve krčmy je ochotný (ale
+nemusí) vypiť len najlacnejší alkohol, ktorý tá krčma čapuje a ktorý on zároveň
+ľúbi, a aj to len vtedy, ak zatiaľ nepozná (t.j. predtým nenavštívil) krčmu, ktorá ten
+alkohol čapuje lacnejšie. Nájdite všetkých držgrošov.
+(Patria medzi nich aj abstinenti. Vo výsledku chceme len pijanov, ktorí aspoň raz navštívili krčmu.) 
+
+\item Pijan je \emph{silne závislý} na niektorom alkohole vtedy, ak ten alkohol konzumuje pri
+každej návšteve krčmy, ktorá ten alkohol čapuje; a zároveň platí, že množstvá toho
+alkoholu, ktoré pije pri takých návštevách, tvoria s rastúcim časom neklesajúcu
+postupnosť. Nájdite všetky dvojice [P, A] také, že pijan P je silne závislý na alkohole A.
+
+\item Pijan je \emph{lojálny ku krčme} K, ak žiaden z alkoholov, ktorý pil v K, už potom nikde inde nepil.
+Nájdite všetky dvojice [P, K] také, že pijan P je lojálny ku krčme K.
+
+
+\item agregácia pijanov
+$EDB=\{lubi(Pijan, Alkohol), capuje(Krcma, Alkohol, Cena),$\\
+\hspace*{1cm} $navstivil(Id, Pijan, Krcma), vypil(Id, Alkohol, Mnozstvo)\}$
+\begin{itemize}
+    \item alkoholy, ktoré boli vypité v krčme Stein v celkovom množstve väčšom ako 20
+    \item dvojice [P, Pocet], ktoré hovoria, v koľkých krčmách prepil pijan P aspoň 10 EUR počas niektorej (jednej) návštevy
+    \item dvojice [K, A] také, že alkohol A sa v krčme K vypil v celkovom množstve väčšom ako 50
+    \item trojice [Pijan, Alkohol, Pocet], ktoré o hovoria, pri koľkých návštevách ten pijan ten alkohol vypil (netreba nájsť trojice s počtom 0)
+    \item trojice [P, K, Pocet], ktoré hovoria, pri koľkých návštevách pijan P vypil v krčme K aspoň 5 borovičiek na jedno posedenie (trojice s nulovým počtom nás nezaujímajú)
+    \item pijani, ktorí sú v niektorej krčme lokálnymi šampiónmi v pití rumu (t.j. hľadaný pijan v aspoň jednej krčme vypil dokopy viacej rumu než ľubovoľný iný pijan)
+    \item trojice [K, P1, P2] také, že pijan P1 navštívil krčmu K viackrát než pijan P2 (P2 nemusel krčmu K vôbec navštíviť); a zároveň pijan P1 minul v krčme K viacej
+            peňazí než pijan P2 (P2 nemusel v krčme K minúť žiadne peniaze). % TODO doplnit do databazy cenu k capovanemu alkoholu
+    \item dvojice [K, A], o ktorých platí, že krčma K čapuje alkohol A a zároveň v krčme K sa alkohol A vypil v menšom celkovom množstve než
+            v ktorejkoľvek inej krčme, ktorá čapuje alkohol A (pozor, v krčme K sa alkohol A možno nikdy nepil)
+    \item dvojice [A, M] také, že M je mediánom ceny alkoholu A cez všetky krčmy, ktoré alkohol A čapujú
+    \item pijani, ktorí ľúbia aspoň 10 rôznych alkoholov
+    \item pijanov, pre ktorých platí, že existuje aspoň jeden alkohol, ktorý ten pijan vypil pri každej svojej návšteve krčmy; a zároveň platí, že
+            ten alkohol vypil v priemernom množstve aspoň 3 na jednu návštevu
+    \item dvojice [Alkohol, Suma], ktoré popisujú množstvo alkoholu vypitého v krčme Carlton (vo výsledku len tie, čo sa niekedy pili)
+    \item dvojice [P, Suma], ktoré hovoria, koľko peňazí pijan P celkovo prepil v krčmách, ktoré čapujú len alkoholy, ktoré P neľúbi (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item dvojice [K, Suma], ktoré hovoria, koľko peňazí v krčme K celkovo prepili pijani, ktorí tú krčmu navštívili viac než stokrát (dvojice s nulovou sumou nemajú byť vo výsledku)
+    \item trojice [P, K, Priemer] ktoré hovoria, koľko peňazí utratil pijan P v priemere pri jednej návšteve krčmy K (trojice s nulovým priemerom nemajú byť vo výsledku)
+\end{itemize}
+

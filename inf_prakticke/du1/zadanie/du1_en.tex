@@ -1,0 +1,110 @@
+\documentclass[10pt, a4paper]{article}
+
+% slovencina
+\usepackage[activeacute, english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% rozmery stranky
+%\usepackage{a4wide}
+\addtolength{\voffset}{-3cm}
+\addtolength{\hoffset}{-1.5cm}
+\addtolength{\textwidth}{3 cm}
+\addtolength{\textheight}{5 cm}
+\usepackage{array}
+\usepackage{mdwlist}
+
+% fonty pre text a matematiku
+%\usepackage{newcent}
+%\usepackage{euler}
+\usepackage{amsmath}
+
+
+% AMS-TeX
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{amsthm}
+
+\def\ans#1{\big[\hskip 2mm {#1}\hskip 2mm\big]}
+\def\N{\mathbb N}
+\def\Z{\mathbb Z}
+\def\Q{\mathbb Q}
+\def\R{\mathbb R}
+\def\C{\mathbb C}
+
+\DeclareMathOperator{\likes}{likes}
+\DeclareMathOperator{\serves}{serves}
+\DeclareMathOperator{\visited}{visited}
+\DeclareMathOperator{\drank}{drank}
+\DeclareMathOperator{\answera}{answer\_a}
+\DeclareMathOperator{\answerb}{answer\_b}
+\DeclareMathOperator{\answerc}{answer\_c}
+\DeclareMathOperator{\answerd}{answer\_d}
+
+\begin{document}
+
+\addtolength{\parskip}{0.5\baselineskip}
+
+\pagestyle{empty}
+
+
+\centerline{\bf\large Homework}
+
+\bigskip
+
+\noindent We are given the database
+\begin{eqnarray*}
+& & \likes(Drunkard, Alcohol), \serves(Pub, Alcohol, Cost),\\
+& & \visited(Id, Drunkard, Pub, From), \drank(Id, Alcohol, Quantity).
+\end{eqnarray*}
+The attribute $Id$ in relations $\visited$ and $\drank$ is the identifier of the visit; every visit concerns exactly one drunkard and exactly one pub. The attribute $From$ is the start of the visit. In every moment, any drunkard is present in at most one pub.
+
+The attribute $Cost$ in $\serves$ is the price of the alcohol in that pub (prices never change). Every pub serves at least one alcohol.
+The attribute $Q$ in $\drank$ is the amount of the alcohol (total amount for the visit; for each visit and alcohol, there is at most one record in $\drank$); $Q$ is always positive. The relation $\drank$ contains only alcohols served in the pub being visited.
+
+You may assume that the database is consistent (no contradictions).
+
+\noindent There are four tasks:
+
+\begin{itemize}
+\item $\answera(D, P)$
+
+A drunkard is \emph{loyal to a pub} P if he drank there at least once and for any of the alcohols he ever drank in P, he never drank it elsewhere during a later visit. Find all pairs [D, P] such that the drunkard D is loyal to P.
+
+\item $\answerb(D, A)$
+
+We say that a drunkard is \emph{strongly addicted to an alcohol} A if the amounts of A he drinks on subsequent visits form a non-decreasing sequence (in other words, if he drank $x$ on one occasion, he will only drink at least $x$ in the future whenever he drinks the same alcohol). Find all pairs [D, A] such that the drunkard D is strongly addicted to the alcohol A.
+
+\item $\answerc(D, A)$
+
+A drunkard is the \emph{sole record holder in drinking an alcohol A at one sitting in a pub P}, if he drank A in P at least once and during one of his visits to P he drank more of the alcohol A then any other drunkard during any other visit. Find all pairs [D, A] such that the drunkard D likes the alcohol A and in every pub serving A, the drunkard D is the sole record holder in drinking A at one sitting.
+
+\item $\answerd(D)$
+
+A \emph{miser} is a drunkard who\\
+(1) never drinks anything he does not like and\\
+(2) during any visit of a pub he drinks only the cheapest alcohols served there, and even in that case only if he has never seen (during his previous visits) the alcohol being served for a lower price elsewhere.
+
+Find all misers that have visited at least one pub.
+
+(A miser might choose not to drink at all during a pub visit. All abstinents are misers, too.)
+\end{itemize}
+
+\bigskip
+\bigskip
+
+\centerline{\bf\large Further instructions}
+
+\bigskip
+
+\begin{itemize}
+\item All the rules you use must be safe.
+%\item Používajte korektnú syntax SWI-Prolog (verzia 5.10.1). Riešenia, v ktorých príkaz {\tt make.} nájde chyby, budú hodnotené len minimálnym počtom bodov.
+% \item Definície všetkých požadovaných predikátov (a prípadných pomocných predikátov) zapíšte do jediného súboru s názvom {\tt du1.pl}. Tento súbor nesmie obsahovať okrem definícií predikátov a prípadných komentárov nič iné.
+% \item Súbor {\tt du1.pl} odošlite ako prílohu e-mailu na adresu {\tt mazak@dcs.fmph.uniba.sk} s predmetom \uv{{\tt databazove praktikum -{}- du1}}. Tento e-mail musí v tele obsahovať vaše celé meno.
+\end{itemize}
+
+
+\end{document}

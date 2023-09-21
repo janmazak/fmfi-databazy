@@ -1,0 +1,234 @@
+\documentclass[12pt]{beamer}
+\usetheme{default}
+\usecolortheme{crane}
+%\usetheme{Madrid}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovak]{babel}
+\usepackage{ucs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{amsmath, amssymb}
+%\usepackage[inline]{asymptote}
+
+%\setbeamersize{text margin left=1pt,text margin right=1pt}
+\setbeamertemplate{footline}[frame number]
+\beamertemplatenavigationsymbolsempty
+
+\let\o=\vee
+\let\a=\wedge
+\let\bigo=\bigvee
+\let\biga=\bigwedge
+
+\title{Databázové systémy}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
+%\date % (optional)
+%{23. 9. 2019}
+
+% database-related stuff
+\DeclareMathOperator{\join}{\bowtie}
+\DeclareMathOperator{\antijoin}{\rhd}
+
+\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
+\DeclareMathOperator{\SUM}{\textrm{SUM}}
+\DeclareMathOperator{\MAX}{\textrm{MAX}}
+
+
+\DeclareMathOperator{\osoba}{osoba}
+\DeclareMathOperator{\firma}{firma}
+\DeclareMathOperator{\vlastni}{vlastni}
+\DeclareMathOperator{\ponuka}{ponuka}
+\DeclareMathOperator{\chce}{chce}
+\DeclareMathOperator{\lubi}{lubi}
+\DeclareMathOperator{\capuje}{capuje}
+\DeclareMathOperator{\navstivil}{navstivil}
+\DeclareMathOperator{\vypil}{vypil}
+\DeclareMathOperator{\answer}{answer}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+Databáza
+\begin{itemize}
+\item kolekcia údajov
+\item so štruktúrou
+\end{itemize}
+\vskip 1cm
+\pause
+
+DBMS (database management system), voľne tiež databáza
+\begin{itemize}
+\item obsahuje veci spoločné pre jednotlivé databázy
+\item pracuje nad dátami abstraktne, používateľ (tvorca konkrétnej databázy) definuje všetky vzťahy medzi dátami (napr. konzistentnosť)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Požiadavky na DBMS
+\begin{itemize}
+\item trvalé uchovanie (persistency)
+\item bezpečnosť (na úrovni hw, sw, používateľov)
+\item paralelizmus (veľa používateľov zároveň)
+\item pohodlnosť (vysokoúrovňové deklaratívne jazyky)
+\item efektívnosť (tisíce dotazov za sekundu)
+\end{itemize}
+\pause
+Aplikácie pracujúce s extrémnymi objemami dát niekedy nevyužívajú DBMS.
+\end{frame}
+
+\begin{frame}
+Čo všetko súvisí s DBMS?
+\begin{itemize}
+\item fyzické umiestnenie dát
+\item sieťové pripojenia (klienti, distribuovanosť databázy)
+\item paralelizmus (veľa používateľov robiacich operácie nad tými istými dátami)
+\item optimalizácia dotazov (algoritmická zložitosť)
+\end{itemize}
+\pause
+\end{frame}
+
+\begin{frame}
+Dátový model
+\begin{itemize}
+\item relačný (tabuľky)
+\item entitno-relačný
+\item objektový
+\item hierarchický (strom)
+\item dokumentový (XML, json)
+\item graf
+\item key-value store
+\end{itemize}
+SQL --- relačný model\\
+NoSQL --- key-value store, graph, document...
+\end{frame}
+
+\begin{frame}
+Databázové jazyky
+\begin{itemize}
+\item Data Definition Language (DDL)
+\item Data Manipulation Language (DML)
+\end{itemize}
+\vskip 1 cm
+\pause
+Prístup k dátam z programovacích jazykov:
+\begin{itemize}
+\item priamo (cez DML)
+\item s jednoduchou nadstavbou (prepared statement atď.)
+\item ORM (object-relational mapper) --- pracuje sa s objektmi, DML sa automaticky generuje v pozadí 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Dotazovacie jazyky
+\begin{itemize}
+\item chceme, aby aplikácie boli nezávislé od reprezentácie dát
+\item optimalizácia na úrovni DBMS, nie u klienta
+\pause
+\item deklaračné jazyky (len čo chceme, nie ako to vypočítať): relačný kalkul (prvorádové matematické formuly), SQL, Datalog
+\pause
+\item interné db jazyky (procedurálne zachytávajú postup výpočtu): relačná algebra, fyzické operátory
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{História}
+\begin{itemize}
+\item 1970: relačný model
+\item 1986: prvý štandard SQL
+\item od cca 2010: NoSQL, Spark...
+\pause
+\item reálne systémy nedržia tempo s teóriou ani štandardmi, napr. rekurzia je v najväčších DBMS implementovaná ani 10 rokov, kým štandard je z 1999
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tento predmet}
+\begin{itemize}
+\item zameraný najmä na praktické aspekty práce s relačnými DBMS
+\item dotazy
+\item navrhovanie databázových schém v relačnom modeli
+\item transakcie
+\item efektivita (význam indexov, vkladanie veľkých objemov dát)
+\pause
+\item ale aj prehľad o teoretických aspektoch (vyjadrovacia sila dotazovacích jazykov, zložitosť vybraných algoritmov)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Hodnotenie}
+\begin{itemize}
+\item účasť na prednáškach ani cvičeniach nie je povinná
+\item z každého cvičenia však treba spraviť aspoň časť\\(10 x 2 b, treba min. 15)
+\item tri domáce úlohy (3 x 20 b)
+\item za semester 80 bodov
+\pause
+\item ústna skúška za 20 bodov, treba min. 10
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ukážka relačného kalkulu}
+Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
+{\tiny
+\begin{align*}
+\Big\{A\mid (\exists I\,\exists M\vypil(I, A, M))&\land \lnot \Big[\exists P (\exists A_2\lubi(P, A_2))\land\lnot\lubi(P, A))\Big)\Big]\\
+&\land \lnot\Big[\exists K \Big((\exists A_2 \capuje(K, A_2))\land \lnot\capuje(K, A)\Big)\Big]\Big\}
+\end{align*}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ukážka datalogu}
+Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
+{\tiny
+\begin{align*}
+\operatorname{nelubenyNiekym}(A) &\leftarrow \vypil(\_, A, \_), \lubi(P, \_), \lnot\lubi(P, A).\\
+\operatorname{necapovanyNiekde}(A) &\leftarrow \vypil(\_, A, \_), \capuje(K, \_), \lnot\capuje(K, A).\\
+\answer(A) &\leftarrow \vypil(\_, A, \_), \lnot\operatorname{nelubenyNiekym}(A), \lnot\operatorname{necapovanyNiekde}(A).\\
+\end{align*}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ukážka relačnej algebry}
+Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
+{\tiny
+\begin{align*}
+\operatorname{nelubenyNiekym} & = (\pi_A(\vypil)\times \pi_P(\lubi))\antijoin \lubi\\
+\operatorname{necapovanyNiekde} & = (\pi_A(\vypil)\times \pi_K(\capuje))\antijoin \capuje\\
+\answer & = ((\pi_A(\vypil) \antijoin \operatorname{nelubenyNiekym})\antijoin \operatorname{necapovanyNiekde}\\
+\end{align*}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ukážka SQL}
+Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
+{\tiny
+\begin{verbatim}
+    SELECT DISTINCT v.A
+    FROM vypil v
+    WHERE NOT EXISTS (SELECT 1 FROM lubi l
+                    WHERE NOT EXISTS (SELECT 1 FROM lubi l2
+                                        WHERE l2.P = l.P AND l2.A = v.A))
+        AND NOT EXISTS (SELECT 1 FROM capuje c
+                        WHERE NOT EXISTS (SELECT 1 FROM capuje c2
+                                        WHERE c2.K = c.K AND c2.A = v.A))
+\end{verbatim}
+}
+\end{frame}
+
+
+
+\end{document}
+
+
+
+

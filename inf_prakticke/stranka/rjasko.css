@@ -1,0 +1,22 @@
+body {
+	background-color: #ffffff;
+	color: #484848;
+	font-size: 12pt;
+	font-family: Verdana, Helvetica, Arial, Sans; 
+}
+
+a:active {  color: #4898ff; text-decoration: underline}
+a:link { color: #4898ff; text-decoration: none}
+/** a:visited {  color: #0000cc; text-decoration: none} **/
+a:visited {  color: #4898ff; text-decoration: none}
+a:hover {color: #4898ff;text-decoration: underline}
+
+.pravemenusede {
+	color: #969696;
+	font-weight:normal;
+	font-size:12pt;
+}
+
+.navigaciaHore {
+	font-size:12pt;
+}

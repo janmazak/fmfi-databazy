@@ -6,7 +6,7 @@
 
 ## Skriptá
 
-* [Skriptá k dotazom](dotazy.pdf)
+* [Skriptá k dotazom](skripta_dotazy/dotazy.pdf)
 * [Prvorádové formuly](http://www.dcs.fmph.uniba.sk/texty/dsmain.pdf) (kap. 1.3)
 
 ## Prezentácie zo sveta
