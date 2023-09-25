@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{amsmath, amssymb}
+\usepackage{hyperref, url}
 %\usepackage[inline]{asymptote}
 
 %\setbeamersize{text margin left=1pt,text margin right=1pt}
@@ -22,7 +23,7 @@
 \let\bigo=\bigvee
 \let\biga=\bigwedge
 
-\title{Databázové systémy}
+\title{Relačný model a úvod do SQL}
 \author{Ján Mazák}
 \institute{FMFI UK Bratislava}
 \date{}
@@ -54,181 +55,158 @@
 
 \frame{\titlepage}
 
-\begin{frame}
-Databáza
-\begin{itemize}
-\item kolekcia údajov
-\item so štruktúrou
-\end{itemize}
-\vskip 1cm
-\pause
+\begin{frame}{Relačný model}
+Databáza pozostáva z tabuliek (\alert{relácií}).\\[3mm]
 
-DBMS (database management system), voľne tiež databáza
-\begin{itemize}
-\item obsahuje veci spoločné pre jednotlivé databázy
-\item pracuje nad dátami abstraktne, používateľ (tvorca konkrétnej databázy) definuje všetky vzťahy medzi dátami (napr. konzistentnosť)
-\end{itemize}
+Stĺpce --- \alert{atribúty}; každý má doménu (množinu povolených hodnôt, čiže dátový typ prípadne zúžený dodatočnými obmedzeniami). Určené pomenovaním alebo pozíciou.\\[3mm]
+
+Riadky --- \alert{záznamy} (records, rows, tuples, n-tice).
 \end{frame}
 
-\begin{frame}
-Požiadavky na DBMS
-\begin{itemize}
-\item trvalé uchovanie (persistency)
-\item bezpečnosť (na úrovni hw, sw, používateľov)
-\item paralelizmus (veľa používateľov zároveň)
-\item pohodlnosť (vysokoúrovňové deklaratívne jazyky)
-\item efektívnosť (tisíce dotazov za sekundu)
-\end{itemize}
-\pause
-Aplikácie pracujúce s extrémnymi objemami dát niekedy nevyužívajú DBMS.
-\end{frame}
-
-\begin{frame}
-Čo všetko súvisí s DBMS?
-\begin{itemize}
-\item fyzické umiestnenie dát
-\item sieťové pripojenia (klienti, distribuovanosť databázy)
-\item paralelizmus (veľa používateľov robiacich operácie nad tými istými dátami)
-\item optimalizácia dotazov (algoritmická zložitosť)
-\end{itemize}
-\pause
-\end{frame}
-
-\begin{frame}
-Dátový model
-\begin{itemize}
-\item relačný (tabuľky)
-\item entitno-relačný
-\item objektový
-\item hierarchický (strom)
-\item dokumentový (XML, json)
-\item graf
-\item key-value store
-\end{itemize}
-SQL --- relačný model\\
-NoSQL --- key-value store, graph, document...
-\end{frame}
-
-\begin{frame}
-Databázové jazyky
-\begin{itemize}
-\item Data Definition Language (DDL)
-\item Data Manipulation Language (DML)
-\end{itemize}
-\vskip 1 cm
-\pause
-Prístup k dátam z programovacích jazykov:
-\begin{itemize}
-\item priamo (cez DML)
-\item s jednoduchou nadstavbou (prepared statement atď.)
-\item ORM (object-relational mapper) --- pracuje sa s objektmi, DML sa automaticky generuje v pozadí 
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-Dotazovacie jazyky
-\begin{itemize}
-\item chceme, aby aplikácie boli nezávislé od reprezentácie dát
-\item optimalizácia na úrovni DBMS, nie u klienta
-\pause
-\item deklaračné jazyky (len čo chceme, nie ako to vypočítať): relačný kalkul (prvorádové matematické formuly), SQL, Datalog
-\pause
-\item interné db jazyky (procedurálne zachytávajú postup výpočtu): relačná algebra, fyzické operátory
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{História}
-\begin{itemize}
-\item 1970: relačný model
-\item 1986: prvý štandard SQL
-\item od cca 2010: NoSQL, Spark...
-\pause
-\item reálne systémy nedržia tempo s teóriou ani štandardmi, napr. rekurzia je v najväčších DBMS implementovaná ani 10 rokov, kým štandard je z 1999
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Tento predmet}
-\begin{itemize}
-\item zameraný najmä na praktické aspekty práce s relačnými DBMS
-\item dotazy
-\item navrhovanie databázových schém v relačnom modeli
-\item transakcie
-\item efektivita (význam indexov, vkladanie veľkých objemov dát)
-\pause
-\item ale aj prehľad o teoretických aspektoch (vyjadrovacia sila dotazovacích jazykov, zložitosť vybraných algoritmov)
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Hodnotenie}
-\begin{itemize}
-\item účasť na prednáškach ani cvičeniach nie je povinná
-\item z každého cvičenia však treba spraviť aspoň časť\\(10 x 2 b, treba min. 15)
-\item tri domáce úlohy (3 x 20 b)
-\item za semester 80 bodov
-\pause
-\item ústna skúška za 20 bodov, treba min. 10
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ukážka relačného kalkulu}
-Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
-{\tiny
-\begin{align*}
-\Big\{A\mid (\exists I\,\exists M\vypil(I, A, M))&\land \lnot \Big[\exists P (\exists A_2\lubi(P, A_2))\land\lnot\lubi(P, A))\Big)\Big]\\
-&\land \lnot\Big[\exists K \Big((\exists A_2 \capuje(K, A_2))\land \lnot\capuje(K, A)\Big)\Big]\Big\}
-\end{align*}
-}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ukážka datalogu}
-Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
-{\tiny
-\begin{align*}
-\operatorname{nelubenyNiekym}(A) &\leftarrow \vypil(\_, A, \_), \lubi(P, \_), \lnot\lubi(P, A).\\
-\operatorname{necapovanyNiekde}(A) &\leftarrow \vypil(\_, A, \_), \capuje(K, \_), \lnot\capuje(K, A).\\
-\answer(A) &\leftarrow \vypil(\_, A, \_), \lnot\operatorname{nelubenyNiekym}(A), \lnot\operatorname{necapovanyNiekde}(A).\\
-\end{align*}
-}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ukážka relačnej algebry}
-Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
-{\tiny
-\begin{align*}
-\operatorname{nelubenyNiekym} & = (\pi_A(\vypil)\times \pi_P(\lubi))\antijoin \lubi\\
-\operatorname{necapovanyNiekde} & = (\pi_A(\vypil)\times \pi_K(\capuje))\antijoin \capuje\\
-\answer & = ((\pi_A(\vypil) \antijoin \operatorname{nelubenyNiekym})\antijoin \operatorname{necapovanyNiekde}\\
-\end{align*}
-}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Ukážka SQL}
-Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všade (kde niečo čapujú) a niekto ich už pil.
-{\tiny
+\begin{frame}[fragile]{Relačný model}
 \begin{verbatim}
-    SELECT DISTINCT v.A
-    FROM vypil v
-    WHERE NOT EXISTS (SELECT 1 FROM lubi l
-                    WHERE NOT EXISTS (SELECT 1 FROM lubi l2
-                                        WHERE l2.P = l.P AND l2.A = v.A))
-        AND NOT EXISTS (SELECT 1 FROM capuje c
-                        WHERE NOT EXISTS (SELECT 1 FROM capuje c2
-                                        WHERE c2.K = c.K AND c2.A = v.A))
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY,
+    lastName TEXT NOT NULL,
+    firstName VARCHAR(255),
+    age INTEGER CHECK (age >= 18)
+);
 \end{verbatim}
-}
 \end{frame}
 
+\begin{frame}{Relačný model}
+Reláciu možno vnímať ako predikát alebo ako (multi)množinu záznamov.\\[3mm]
+
+V bežných DBMS sa relácia chápe ako multimnožina:
+\begin{itemize}
+\item na poradí riadkov nezáleží;
+\item riadky v tabuľke sa môžu opakovať.
+\end{itemize}
+
+Odstránenie duplikátnych záznamov z výsledku dotazu:\\
+SELECT DISTINCT x, y FROM ...
+\end{frame}
+
+\begin{frame}{NULL}
+\begin{itemize}
+\item Špeciálna hodnota \alert{NULL} zodpovedá neznámej hodnote.
+\item Trojhodnotová logika, napr. `NULL OR FALSE` je NULL.
+\item Test, či je hodnota NULL: `x IS NULL`, `x IS NOT NULL`
+\item Pri vytváraní tabuľky možno NULL zakázať.
+Inak treba starostlivo uvažovať, ako ovplyvní operátory a agregačné funkcie (napr. priemer hodnôt v stĺpci).
+Nehádajte, použite dokumentáciu.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Dotazy v SQL}
+Základná štruktúra:
+\begin{verbatim}
+SELECT attr1 AS a1, attr2 AS a2
+FROM table AS t
+WHERE t.a2 > 10
+ORDER BY attr1, attr2
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Dotazy v SQL}
+\begin{itemize}
+\item Pri kľúčových slovách jazyka SQL sa nerozlišujú malé a veľké písmená,
+ale pre dáta uložené v db áno (ak to nezmeníme napr. použitím ILIKE v podmienke za WHERE).
+\item Case-sensitivity tabuliek a atribútov závisí od DBMS a operačného systému.
+\item Úvodzovky pre stĺpce: \verb|"atribút s medzerou v názve"|
+\item Apostrofy pre konštantné reťazce: \verb|'reťazec'|
+\end{itemize}
+
+Bežné konvencie:
+\begin{itemize}
+\item názvy tabuliek aj atribútov lower case
+\item kľúčové slová SQL upper case
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Dotazy v SQL}
+Vo výsledku nemusia byť len pôvodné hodnoty atribútov, ale aj čosi z nich vyrátané (napr. aritmetické výrazy zložené z konštánt, funkcií implementovaných v db a hodnôt atribútov daného riadka).\\[3mm]
+
+\begin{verbatim}
+SELECT 
+    concat(e.firstname,' ',e.lastname) AS ename,
+    (CASE
+        WHEN e.comm IS NULL THEN e.sal
+        ELSE e.comm + e.sal
+    ) AS total_salary,
+    0.8 * e.sal AS salaryAfterTax 
+FROM emp AS e
+WHERE deptno >= 20 AND lower(e.firstname) = 'john'
+LIMIT 1 OFFSET 7
+\end{verbatim}
+\end{frame}
+
+
+\begin{frame}{Join}
+\alert{Join} --- spojenie záznamov z dvoch tabuliek.\\[3mm]
+
+Je to podmnožina karteziánskeho súčinu tabuliek (každý riadok s každým)
+špecifikovaná dodatočnými podmienkami na prepájanie.
+\end{frame}
+
+\begin{frame}{Join --- karteziánsky súčin}
+\includegraphics[scale=.12]{join1}
+\end{frame}
+
+\begin{frame}{Join --- INNER JOIN}
+\includegraphics[scale=.12]{join2}
+\end{frame}
+
+\begin{frame}{Join --- LEFT JOIN}
+\includegraphics[scale=.12]{join3}
+\end{frame}
+
+\begin{frame}{Join --- RIGHT JOIN}
+\includegraphics[scale=.12]{join4}
+\end{frame}
+
+\begin{frame}{Join --- FULL OUTER JOIN}
+\includegraphics[scale=.12]{join5}
+\end{frame}
+
+\begin{frame}[fragile]{Negácia}
+Negáciu možno vyjadriť pomocou vnoreného dotazu (subquery) a NOT EXISTS:
+\begin{verbatim}
+SELECT e.name
+FROM emp e
+WHERE NOT EXISTS (SELECT 1
+                  FROM emp e2 
+                  WHERE e2.salary > e.salary)
+\end{verbatim}
+(Nezáleží na tom, ktoré stĺpce sú vymenované za SELECT vo vnútornom dotaze, pretože EXISTS len testuje, či sa tam nachádza aspoň jeden riadok.)
+\end{frame}
+
+
+
+\begin{frame}{Literatúra}
+\begin{itemize}
+\item {\scriptsize\url{https://cs186berkeley.net/notes/note1/}}
+\item {\scriptsize\url{https://cs186berkeley.net/notes/note2/}}
+\item {\scriptsize\url{https://www.postgresql.org/docs/current/functions-comparison.html}}
+\item {\scriptsize\url{https://drive.google.com/file/d/1HCq2KMZ05UvtXGe1nTqNmkwhc3X-NLI3/view}}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Úlohy: SQL}
+Databáza: \emph{osoba}(A), \emph{pozna}(Kto, Koho)
+\begin{itemize}
+    \item osoby, ktoré poznajú sysľa
+    \item osoby, ktoré majú aspoň dvoch známych (osoby)
+    \item osoby, ktoré nepoznajú nikoho (žiadne iné osoby)
+    \item osoby, ktoré pozná presne jedna osoba
+    \item osoby, ktoré poznajú iba Jožka
+    \item osoby, ktoré poznajú všetkých známych svojich známych
+    \item osoby, ktoré majú všetky vzťahy symetrické
+\end{itemize}
+\end{frame}
 
 
 \end{document}
-
-
 
 
