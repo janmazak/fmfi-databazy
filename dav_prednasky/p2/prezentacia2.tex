@@ -196,13 +196,15 @@ WHERE NOT EXISTS (SELECT 1
 \begin{frame}{Úlohy: SQL}
 Databáza: \emph{osoba}(A), \emph{pozna}(Kto, Koho)
 \begin{itemize}
+	\item všetky osoby
     \item osoby, ktoré poznajú sysľa
-    \item osoby, ktoré majú aspoň dvoch známych (osoby)
-    \item osoby, ktoré nepoznajú nikoho (žiadne iné osoby)
-    \item osoby, ktoré pozná presne jedna osoba
+    \item osoby, ktoré poznajú aspoň dve entity\\ (nemusia to byť osoby)
+    \item osoby, ktoré nepoznajú nič a nikoho
+    \item osoby, ktoré nepoznajú žiadne iné osoby
     \item osoby, ktoré poznajú iba Jožka
-    \item osoby, ktoré poznajú všetkých známych svojich známych
-    \item osoby, ktoré majú všetky vzťahy symetrické
+    \item osoby, ktoré pozná presne jedna osoba
+%    \item osoby, ktoré poznajú všetkých známych svojich známych
+%    \item osoby, ktoré majú všetky vzťahy symetrické
 \end{itemize}
 \end{frame}
 
