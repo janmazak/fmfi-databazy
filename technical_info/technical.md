@@ -7,7 +7,8 @@ General instructions: [Linux (ssh)](https://www.ssh.com/ssh/command/#using-the-l
 
 There should be SQLite and Postgresql available.
 
-To download files from the web to the server cvika, use [wget](https://www.gnu.org/software/wget/manual/wget.html). You might want to get some experience with efficient file transfer by using [rsync](https://linuxtechlab.com/files-transfer-scp-rsync-commands/) too (it's not needed for this course).
+To download files from the web to the server cvika, use [wget](https://www.gnu.org/software/wget/manual/wget.html). Be careful when downloading from github, you want the link for the ["raw" version of the file](https://docs.github.com/en/enterprise-cloud@latest/repositories/working-with-files/using-files/viewing-a-file#viewing-or-copying-the-raw-file-content).
+You might want to get some experience with efficient file transfer by using [rsync](https://linuxtechlab.com/files-transfer-scp-rsync-commands/) too (it's not needed for this course).
 
 If you have never tried it, we strongly encourage you to try setting up [ssh key authentication](https://www.ssh.com/ssh/key/) instead of using a password.
 
