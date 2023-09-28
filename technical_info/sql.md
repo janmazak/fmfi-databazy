@@ -43,7 +43,12 @@ PostgreSQL is available on the server `cvika`, or you can install it on your com
 
 There is an [online environment](https://onecompiler.com/postgresql/3xk8tb9w4) available, too. (We don't know about its capabilities, and suggest that you do not use online environments exclusively.)
 
-* To access your database, run `psql` in the terminal. It opens the interactive PostgreSQL terminal. The SQL commands you write should end with semicolon.
+* To fill an existing database with tables from a file containing SQL commands, say, `employee.sql`, run
+```
+	psql -f employee.sql
+```
+
+* To access your database, run `psql` in the terminal. It opens the interactive PostgreSQL terminal. The SQL commands you write into it should end with semicolon.
 
 * To run SQL queries written in a file `queries.sql`, use
 ```
