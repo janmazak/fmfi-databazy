@@ -26,8 +26,8 @@ FROM employee;
 
 /* 9. Which departments are empty (have no employees)? */
 
-/* 10. (1 point) Which departments contain all job positions? (Your query must not rely on specific positions in the given dataset.) */
+/* 10. (1 point) Which departments have an employee for every job in the database? (Your query must not rely on specific jobs in the given dataset.) */
 
-/* 11. (1 point) Which employees manage only clerks? */
+/* 11. (1 point) Which employees manage only clerks? (Interpretation: at least one clerk and only clerks.) */
 
 /* 12. Which departments employ only salesmen? */

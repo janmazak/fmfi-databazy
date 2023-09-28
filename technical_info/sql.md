@@ -30,9 +30,10 @@ and then running `SELECT * FROM emp;` in the interactive terminal that opens. Do
 	sqlite3 emp.db < queries.sql
 ```
 
-* There are special ["dot commands"](https://www.sqlite.org/cli.html) to investigate the database structure. E.g.
+* There are special ["dot commands"](https://www.sqlite.org/cli.html) to investigate the database structure or set various options. E.g.
 	- `.tables` shows a list of tables,
-	- `.schema <tablename>` gives you details about a particular table.
+	- `.schema <tablename>` gives you details about a particular table,
+	- `.headers on` adds the list of column names to the output.
 
 For a graphical interface to interact with an SQLite database, we suggest [sqlitebrowser](https://sqlitebrowser.org/). The tab `Execute SQL` allows you to run SQL commands.
 
