@@ -33,7 +33,7 @@ CREATE TABLE project (
 insert into department values (10, 'Accounting', 'New York');
 insert into department values (20, 'Research', 'Dallas');
 insert into department values (30, 'Sales', 'Chicago');
-insert into department values (40, 'Operations', 'Boston');   
+insert into department values (40, 'Operations', 'Boston');
 
 
 insert into employee values (11, 'King', 'president', null, '1990-06-09', 5000, 10);
@@ -56,4 +56,3 @@ insert into project values (1, 'Enviro1', 21);
 insert into project values (2, 'Enviro2', 14);
 insert into project values (3, 'Nuclear1', 14);
 insert into project values (3, 'Nuclear1', 17);
-
