@@ -1,0 +1,144 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+
+\documentclass[12pt]{beamer}
+\usetheme{default}
+\usecolortheme{crane}
+%\usetheme{Madrid}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovak]{babel}
+\usepackage{ucs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref, url}
+\usepackage{alltt}
+%\usepackage[inline]{asymptote}
+
+%\setbeamersize{text margin left=1pt,text margin right=1pt}
+\setbeamertemplate{footline}[frame number]
+\beamertemplatenavigationsymbolsempty
+
+\let\o=\vee
+\let\a=\wedge
+\let\bigo=\bigvee
+\let\biga=\bigwedge
+
+% https://www.overleaf.com/learn/latex/Using_colours_in_LaTeX
+\def\blue#1{\textcolor{Cerulean}{#1}}
+
+\title{Relačná algebra}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
+%\date % (optional)
+%{23. 9. 2019}
+
+% database-related stuff
+\DeclareMathOperator{\join}{\bowtie}
+\DeclareMathOperator{\antijoin}{\rhd}
+
+\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
+\DeclareMathOperator{\SUM}{\textrm{SUM}}
+\DeclareMathOperator{\MAX}{\textrm{MAX}}
+
+
+\DeclareMathOperator{\osoba}{osoba}
+\DeclareMathOperator{\firma}{firma}
+\DeclareMathOperator{\vlastni}{vlastni}
+\DeclareMathOperator{\ponuka}{ponuka}
+\DeclareMathOperator{\chce}{chce}
+\DeclareMathOperator{\lubi}{lubi}
+\DeclareMathOperator{\capuje}{capuje}
+\DeclareMathOperator{\navstivil}{navstivil}
+\DeclareMathOperator{\vypil}{vypil}
+\DeclareMathOperator{\answer}{answer}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]{Common Table Expressions (CTE)}
+WITH vytvorí reláciu existujúcu len počas výpočtu dotazu.
+\bigskip
+\begin{alltt}
+\alert{WITH} pijanPocetA(pijan, c) AS (
+    SELECT pijan, COUNT(DISTINCT alkohol)
+    FROM lubi
+)
+SELECT MAX(ppa.c)
+FROM pijanPocetA ppa
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{Relačná algebra}
+\begin{itemize}
+    \item interný jazyk, do ktorého sa prekladajú všetky dotazy
+    \item tiež jazyk na formalizáciu relačného modelu a matematické dokazovanie
+    \item zachytáva postup výpočtu dotazu pomocou\\ \alert{logických operátorov} (nezohľadňujú fyzické uloženie dát)
+    \item vstupom aj výstupom operátora je relácia
+    \item k danému dotazu možno zostrojiť rôzne zápisy (operátorové stromy) v relačnej algebre, databáza si sama vyberie ten, čo pokladá za najvhodnejší
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Relačná algebra}
+\includegraphics[scale=.8]{query1x.jpg}
+\includegraphics[scale=.8]{query2x.jpg}\\[3mm]
+\tiny{\url{https://dbis-uibk.github.io/relax/calc/gist/379b0fdd72490e8e634bb193f109d4a8}}
+\end{frame}
+
+\begin{frame}[fragile]{Logické operátory}
+\begin{itemize}
+    \item $\pi$ --- projekcia (vyberáme stĺpce)
+    \item $\sigma$ --- selekcia (vyberáme riadky)
+    \item $\rho$ --- premenovanie (relácie či atribútu)
+    \item $\times$ --- karteziánsky súčin
+    \item $\bowtie$ --- theta-join (natural join / join s podmienkami)
+    \item $\antijoin$ --- antijoin (riadky 1. relácie, ktoré sa nedajú joinovať\\ \hskip 2.5cm so žiadnymi riadkami 2. relácie)
+    \item $-, \cup, \cap$ --- rozdiel, zjednotenie, prienik množín
+    \item $\Gamma$ or $\gamma$ --- group by
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Logické operátory}
+\begin{alltt}
+SELECT a1, a2, COUNT(a3) AS b
+FROM r1, r2
+WHERE c1 OR c2
+GROUP BY g1, g2
+HAVING h1 AND h2
+\end{alltt}
+$$\pi_{a1, a2, b}(\sigma_{h1\a h2}(\Gamma_{g1, g2, COUNT(a3)\rightarrow b} (r1\bowtie_{c1 \o c2} r2)))$$
+\bigskip
+$$j := r_1\bowtie_{c_1 \o c_2} r_2$$
+$$\pi_{a_1, a_2, b}(\sigma_{h_1\a h_2}(\Gamma_{g_1, g_2, COUNT(a_3)\rightarrow b} (j)))$$
+\end{frame}
+
+\begin{frame}{Literatúra}
+\begin{itemize}
+\item {\scriptsize\url{https://www.db-book.com/slides-dir/PDF-dir/ch2.pdf}}
+\item {\scriptsize\url{https://dbis-uibk.github.io/relax/calc/gist/379b0fdd72490e8e634bb193f109d4a8}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Úlohy: relačná algebra}
+Databáza: \emph{lubi}(Pijan, Alkohol), \emph{capuje}(Krcma, Alkohol, Cena),
+\emph{navstivil}(Id, Pijan, Krcma), \emph{vypil}(Id, Alkohol, Mnozstvo)
+\begin{itemize}
+	\item pijani, čo ľúbia pivo
+	\item koľko stojí najlacnejšie pivo?
+    \item alkoholy, ktoré čapujú, ale nik ich neľúbi
+    \item alkoholy, ktoré čapujú, ale nik ich nepil
+	\item najdrahší čapovaný alkohol (všetky, ak ich je viac)
+	\item pijani, ktorí navštívili všetky krčmy, čo niečo čapujú
+    \item krčma s najväčšou celkovou tržbou
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+
+
