@@ -1,28 +1,28 @@
+/* ------------------------------------------------------------------------ */
+/* Write and test the following queries ----------------------------------- */
+/* ------------------------------------------------------------------------ */
 
-/*  1. Vypiste nazvy vsetkych knih, ktore su prave teraz pozicane (t.j. neexistuje zaznam o ich vrateni). */
+/* You can use aggregate functions like MIN, SUM or COUNT. */
+/* You might want to add records in the tables for testing correctness of your answers. Feel free to modify 'employee.sql'. */
 
-/*  2. Vypiste meno, datum registracie, den v tyzdni (v den registracie) pre vsetkych citatelov, ktori sa registrovali pocas posledneho roka. 
-Hint: na vypis dna v tyzdni v ludsky citatelnom formate pouzite CASE statement. */
+/* 1. For each department, count the number of employees working there. */
 
-/*  3. Vypiste vsetky trojice [C, K, DatumPozicania], kde K je nazov knihy, ktoru si citatel s menom C pozical, ale este ju nevratil. */
+/* 2. For each employee whose name starts with 'B', count the number of projects he participates in, and display the results only for employees working on more than 1 project. */
 
-/*  4. Najdite mena citatelov, ktori vratili do 1 mesiaca kazdu z knih, ktore si pozicali. (Vratane citatelov, ktori si nikdy nepozicali nic.) */
+/* 3. For each project, compute the number of employees, average salary of those employees, and the number of departments participating in it. */
 
-/*  5. Vypiste mena citatelov, ktori si pozicali aspon dve rozne knihy, pricom vsetky ich pozicane knihy boli od toho isteho autora. */
+/* 4. (1 point) For each employee, count the number of projects he participates in, and display the results (including zero for employees working on no projects). */
 
-/*  6. Ku kazdemu citatelovi vypiste nazov prvej knihy, ktoru si pozical, alebo null, ak si nikdy nepozical nic. */
+/* 5. Find all employees earning the lowest wage. */
 
-/*  7. Najdite citatelov, ktori si nepozicali nic pocas prveho mesiaca od registracie. */
+/* 6. Compute the monthly payroll (the sum of salaries paid to employees) for each project. */
 
-/*  8. Pre kazdeho citatela vypiste dobu jeho najdlhsej vypozicky (len pre knihy, ktore uz vratil). */
+/* 7. Find the department with the largest difference between the highest and lowest salary. */
 
-/* Data modification */
+/* 8. Find the ratio between the employee with the highest and lowest salary. */
 
-/*  9. Zmente meno prvemu registrovanemu citatelovi pomocou UPDATE. */
+/* 9. (1 point) Assume that the first 2000 of an employee's salary are taxed at 20% and any amount above 2000 is taxed at 40%. How much is paid in taxes each month by individual departments? */
 
-/* 10. Zmazte knihy, ktore napisal 'Adolf'. */
+/* 10. How many employees are earning between 40% and 60% of the average salary in their department? */
 
-/* 11. Zmazte knihy, ktore si uz pozical kazdy registrovany citatel. */
-
-/* 12. Pridajte k menu kazdeho citatela, ktory mal v kazdom momente pozicanu nanajvys jednu knihu, retazec " Read more!" */
-
+/* 11. For each project, list all the employees participating in it, together with the ratio of their salary to the average salary in their department. */
