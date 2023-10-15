@@ -1,54 +1,44 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+
 \documentclass[12pt]{beamer}
 \usetheme{default}
 \usecolortheme{crane}
-%\usetheme{Madrid}
 
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[slovak]{babel}
-\usepackage{ucs}
+\usepackage{ucs} % unicode
+
 \usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{array}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref, url}
-%\usepackage[inline]{asymptote}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{alltt}
 
 %\setbeamersize{text margin left=1pt,text margin right=1pt}
 \setbeamertemplate{footline}[frame number]
 \beamertemplatenavigationsymbolsempty
 
-\let\o=\vee
-\let\a=\wedge
-\let\bigo=\bigvee
-\let\biga=\bigwedge
-
-\title{Databázové systémy}
-\author{Ján Mazák}
-\institute{FMFI UK Bratislava}
-\date{}
-%\date % (optional)
-%{23. 9. 2019}
+% https://www.overleaf.com/learn/latex/Using_colours_in_LaTeX
+\def\blue#1{\textcolor{Cerulean}{#1}}
+\def\green#1{\textcolor{LimeGreen}{#1}}
 
 % database-related stuff
 \DeclareMathOperator{\join}{\bowtie}
 \DeclareMathOperator{\antijoin}{\rhd}
 
-\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
-\DeclareMathOperator{\SUM}{\textrm{SUM}}
-\DeclareMathOperator{\MAX}{\textrm{MAX}}
-
-
-\DeclareMathOperator{\osoba}{osoba}
-\DeclareMathOperator{\firma}{firma}
-\DeclareMathOperator{\vlastni}{vlastni}
-\DeclareMathOperator{\ponuka}{ponuka}
-\DeclareMathOperator{\chce}{chce}
 \DeclareMathOperator{\lubi}{lubi}
 \DeclareMathOperator{\capuje}{capuje}
 \DeclareMathOperator{\navstivil}{navstivil}
 \DeclareMathOperator{\vypil}{vypil}
 \DeclareMathOperator{\answer}{answer}
+
+
+\title{Databázové systémy}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
 
 
 \begin{document}
@@ -296,16 +286,10 @@ SQLite
 
 \begin{frame}{Literatúra}
 \begin{itemize}
-\item DBMS:\\
-{\scriptsize\url{http://www.noucamp.org/cp2/dbt/DBIntroduction.pdf}}
-{\scriptsize\url{https://www.db-book.com/slides-dir/PDF-dir/ch1.pdf}}
-{\scriptsize\url{http://infolab.stanford.edu/~ullman/fcdb/ch1.pdf}}
-{\scriptsize\url{https://www.ibm.com/topics/cap-theorem}}
-
-%\item SQL (zatiaľ len SELECT, WHERE, EXISTS):\\
-%{\scriptsize\url{https://www.w3schools.com/sql/sql_intro.asp}}\\
-%{\scriptsize\url{https://sqlbolt.com/lesson/select_queries_introduction}}\\
-%{\scriptsize\url{https://www.learnsqlonline.org/}}\\
+\item {\scriptsize\url{http://www.noucamp.org/cp2/dbt/DBIntroduction.pdf}}
+\item {\scriptsize\url{https://www.db-book.com/slides-dir/PDF-dir/ch1.pdf}}
+\item {\scriptsize\url{http://infolab.stanford.edu/~ullman/fcdb/ch1.pdf}}
+\item {\scriptsize\url{https://www.ibm.com/topics/cap-theorem}}
 \end{itemize}
 \end{frame}
 

@@ -1,54 +1,44 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+
 \documentclass[12pt]{beamer}
 \usetheme{default}
 \usecolortheme{crane}
-%\usetheme{Madrid}
 
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[slovak]{babel}
-\usepackage{ucs}
+\usepackage{ucs} % unicode
+
 \usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{array}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref, url}
-%\usepackage[inline]{asymptote}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{alltt}
 
 %\setbeamersize{text margin left=1pt,text margin right=1pt}
 \setbeamertemplate{footline}[frame number]
 \beamertemplatenavigationsymbolsempty
 
-\let\o=\vee
-\let\a=\wedge
-\let\bigo=\bigvee
-\let\biga=\bigwedge
-
-\title{Relačný model a úvod do SQL}
-\author{Ján Mazák}
-\institute{FMFI UK Bratislava}
-\date{}
-%\date % (optional)
-%{23. 9. 2019}
+% https://www.overleaf.com/learn/latex/Using_colours_in_LaTeX
+\def\blue#1{\textcolor{Cerulean}{#1}}
+\def\green#1{\textcolor{LimeGreen}{#1}}
 
 % database-related stuff
 \DeclareMathOperator{\join}{\bowtie}
 \DeclareMathOperator{\antijoin}{\rhd}
 
-\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
-\DeclareMathOperator{\SUM}{\textrm{SUM}}
-\DeclareMathOperator{\MAX}{\textrm{MAX}}
-
-
-\DeclareMathOperator{\osoba}{osoba}
-\DeclareMathOperator{\firma}{firma}
-\DeclareMathOperator{\vlastni}{vlastni}
-\DeclareMathOperator{\ponuka}{ponuka}
-\DeclareMathOperator{\chce}{chce}
 \DeclareMathOperator{\lubi}{lubi}
 \DeclareMathOperator{\capuje}{capuje}
 \DeclareMathOperator{\navstivil}{navstivil}
 \DeclareMathOperator{\vypil}{vypil}
 \DeclareMathOperator{\answer}{answer}
+
+
+\title{Relačný model a úvod do SQL}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
 
 
 \begin{document}
@@ -83,15 +73,17 @@ V bežných DBMS sa relácia chápe ako multimnožina:
 \item riadky v tabuľke sa môžu opakovať.
 \end{itemize}
 
-Odstránenie duplikátnych záznamov z výsledku dotazu:\\
-SELECT DISTINCT x, y FROM ...
+Odstránenie duplikátnych záznamov z výsledku dotazu:
+\begin{alltt}
+    SELECT \alert{DISTINCT} x, y FROM ...
+\end{alltt}
 \end{frame}
 
-\begin{frame}{NULL}
+\begin{frame}[fragile]{NULL}
 \begin{itemize}
 \item Špeciálna hodnota \alert{NULL} zodpovedá neznámej hodnote.
-\item Trojhodnotová logika, napr. `NULL OR FALSE` je NULL.
-\item Test, či je hodnota NULL: `x IS NULL`, `x IS NOT NULL`
+\item Trojhodnotová logika, napr. \verb|NULL OR FALSE| je NULL.
+\item Test, či je hodnota NULL: \verb|x IS NULL| / \verb|x IS NOT NULL|
 \item Pri vytváraní tabuľky možno NULL zakázať.
 Inak treba starostlivo uvažovať, ako ovplyvní operátory a agregačné funkcie (napr. priemer hodnôt v stĺpci).
 Nehádajte, použite dokumentáciu.
@@ -128,13 +120,13 @@ Bežné konvencie:
 Vo výsledku nemusia byť len pôvodné hodnoty atribútov, ale aj čosi z nich vyrátané (napr. aritmetické výrazy zložené z konštánt, funkcií implementovaných v db a hodnôt atribútov daného riadka).\\[3mm]
 
 \begin{verbatim}
-SELECT 
+SELECT
     concat(e.firstname,' ',e.lastname) AS ename,
     (CASE
         WHEN e.comm IS NULL THEN e.sal
         ELSE e.comm + e.sal
     ) AS total_salary,
-    0.8 * e.sal AS salaryAfterTax 
+    0.8 * e.sal AS salaryAfterTax
 FROM emp AS e
 WHERE deptno >= 20 AND lower(e.firstname) = 'john'
 LIMIT 1 OFFSET 7
@@ -170,17 +162,48 @@ Je to podmnožina karteziánskeho súčinu tabuliek (každý riadok s každým)
 \end{frame}
 
 \begin{frame}[fragile]{Negácia}
-Negáciu možno vyjadriť pomocou vnoreného dotazu (subquery) a NOT EXISTS:
-\begin{verbatim}
-SELECT e.name
-FROM emp e
-WHERE NOT EXISTS (SELECT 1
-                  FROM emp e2 
-                  WHERE e2.salary > e.salary)
-\end{verbatim}
+Negáciu možno vyjadriť pomocou vnoreného dotazu (subquery) a \alert{NOT EXISTS}:
+\begin{alltt}
+/* zamestnanci, ktorí nemajú podriadených */
+SELECT emp.name FROM employee \blue{emp}
+WHERE \alert{NOT EXISTS} (
+    SELECT 1 FROM employee \green{e2}
+    WHERE \green{e2}.superior_id = \blue{emp}.employee_id
+)
+\end{alltt}
 (Nezáleží na tom, ktoré stĺpce sú vymenované za SELECT vo vnútornom dotaze, pretože EXISTS len testuje, či sa tam nachádza aspoň jeden riadok.)
 \end{frame}
 
+\begin{frame}[fragile]{Všeobecný kvantifikátor}
+Jazyk SQL nemá prostriedky na priame vyjadrenie všeobecného kvantifikátora.
+Postupovať možno v duchu
+$$
+    \forall x\ P(x)\qquad \Leftrightarrow\qquad \lnot\ \exists x\ \lnot\, P(x).
+$$
+Zamestnanci, ktorí majú plat aspoň taký ako \alert{všetci} ostatní $\Leftrightarrow$ zamestnanci, ku ktorým neexistuje zamestnanec s vyšším platom.
+\begin{alltt}
+SELECT e.name
+FROM employee e
+WHERE \blue{NOT EXISTS} (SELECT 1
+                  FROM employee e2
+                  WHERE e2.salary > e.salary)
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{CREATE TEMPORARY TABLE}
+Používateľ si vie sám vytvoriť dočasnú tabuľku, ktorá zanikne po odpojení od db alebo na konci transakcie.
+(Taká tabuľka nemusí fyzicky existovať, DBMS ju môže pri každom použití nanovo vygenerovať.)
+\begin{alltt}
+\alert{CREATE TEMPORARY TABLE} \blue{employee_details} AS (
+    SELECT e.empno, e.name, e.deptno,
+           d.name, d.location
+    FROM employee e, department d
+    WHERE e.deptno = d.deptno
+);
+SELECT * FROM \blue{employee_details};
+\end{alltt}
+Hodí sa to napr. ak chceme opakovane využívať ten istý komplikovaný join.
+\end{frame}
 
 
 \begin{frame}{Literatúra}
@@ -189,6 +212,9 @@ WHERE NOT EXISTS (SELECT 1
 \item {\scriptsize\url{https://cs186berkeley.net/notes/note2/}}
 \item {\scriptsize\url{https://www.postgresqltutorial.com/} (Sections 1, 2, 3)}
 \item {\scriptsize\url{https://drive.google.com/file/d/1HCq2KMZ05UvtXGe1nTqNmkwhc3X-NLI3/view}}
+\item {\scriptsize\url{https://www.w3schools.com/sql/sql_intro.asp}}
+\item {\scriptsize\url{https://sqlbolt.com/lesson/select_queries_introduction}}
+\item {\scriptsize\url{https://www.learnsqlonline.org/}}
 \end{itemize}
 \end{frame}
 

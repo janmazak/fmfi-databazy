@@ -3,53 +3,31 @@
 \documentclass[12pt]{beamer}
 \usetheme{default}
 \usecolortheme{crane}
-%\usetheme{Madrid}
 
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[slovak]{babel}
-\usepackage{ucs}
+\usepackage{ucs} % unicode
+
 \usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{array}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref, url}
+\usepackage{graphicx}
+\usepackage{array}
 \usepackage{alltt}
-%\usepackage[inline]{asymptote}
 
 %\setbeamersize{text margin left=1pt,text margin right=1pt}
 \setbeamertemplate{footline}[frame number]
 \beamertemplatenavigationsymbolsempty
 
-\let\o=\vee
-\let\a=\wedge
-\let\bigo=\bigvee
-\let\biga=\bigwedge
-
 % https://www.overleaf.com/learn/latex/Using_colours_in_LaTeX
 \def\blue#1{\textcolor{Cerulean}{#1}}
-
-\title{Relačná algebra}
-\author{Ján Mazák}
-\institute{FMFI UK Bratislava}
-\date{}
-%\date % (optional)
-%{23. 9. 2019}
+\def\green#1{\textcolor{LimeGreen}{#1}}
 
 % database-related stuff
 \DeclareMathOperator{\join}{\bowtie}
 \DeclareMathOperator{\antijoin}{\rhd}
 
-\DeclareMathOperator{\COUNT}{\textrm{COUNT}}
-\DeclareMathOperator{\SUM}{\textrm{SUM}}
-\DeclareMathOperator{\MAX}{\textrm{MAX}}
-
-
-\DeclareMathOperator{\osoba}{osoba}
-\DeclareMathOperator{\firma}{firma}
-\DeclareMathOperator{\vlastni}{vlastni}
-\DeclareMathOperator{\ponuka}{ponuka}
-\DeclareMathOperator{\chce}{chce}
 \DeclareMathOperator{\lubi}{lubi}
 \DeclareMathOperator{\capuje}{capuje}
 \DeclareMathOperator{\navstivil}{navstivil}
@@ -57,22 +35,15 @@
 \DeclareMathOperator{\answer}{answer}
 
 
+\title{Relačná algebra}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
+
+
 \begin{document}
 
 \frame{\titlepage}
-
-\begin{frame}[fragile]{Common Table Expressions (CTE)}
-WITH vytvorí reláciu existujúcu len počas výpočtu dotazu.
-\bigskip
-\begin{alltt}
-\alert{WITH} pijanPocetA(pijan, c) AS (
-    SELECT pijan, COUNT(DISTINCT alkohol)
-    FROM lubi
-)
-SELECT MAX(ppa.c)
-FROM pijanPocetA ppa
-\end{alltt}
-\end{frame}
 
 \begin{frame}[fragile]{Relačná algebra}
 \begin{itemize}
@@ -85,8 +56,8 @@ FROM pijanPocetA ppa
 \end{frame}
 
 \begin{frame}[fragile]{Relačná algebra}
-\includegraphics[scale=.8]{query1x.jpg}
-\includegraphics[scale=.8]{query2x.jpg}\\[3mm]
+\includegraphics[scale=.2]{query1.jpg}
+\includegraphics[scale=.2]{query2.jpg}\\[3mm]
 \tiny{\url{https://dbis-uibk.github.io/relax/calc/gist/379b0fdd72490e8e634bb193f109d4a8}}
 \end{frame}
 
@@ -103,7 +74,31 @@ FROM pijanPocetA ppa
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Logické operátory}
+\begin{frame}[fragile]{Ukážky relačnej algebry}
+Databáza: \emph{lubi}(Pijan, Alkohol), \emph{capuje}(Krcma, Alkohol, Cena),
+\emph{navstivil}(Id, Pijan, Krcma), \emph{vypil}(Id, Alkohol, Mnozstvo)
+
+\bigskip
+
+1. Alkoholy, ktoré niekto ľúbi, ale nikde ich nečapujú
+\blue{
+$$
+    \pi_{Alkohol} (\lubi) - \pi_{Alkohol}(\capuje)
+$$
+$$
+    \pi_{lubi.Alkohol} (lubi\antijoin_{lubi.Alkohol = capuje.Alkohol} capuje)
+$$
+}
+
+2. Počet vypití piva pre jednotlivých pijanov
+\green{
+$$
+    \Gamma_{P, COUNT(Id)\rightarrow C}(\sigma_{Alkohol='pivo'}(\navstivil\join\vypil))
+$$
+}
+\end{frame}
+
+\begin{frame}[fragile]{Ukážky relačnej algebry}
 \begin{alltt}
 SELECT a1, a2, COUNT(a3) AS b
 FROM r1, r2
@@ -111,15 +106,19 @@ WHERE c1 OR c2
 GROUP BY g1, g2
 HAVING h1 AND h2
 \end{alltt}
-$$\pi_{a1, a2, b}(\sigma_{h1\a h2}(\Gamma_{g1, g2, COUNT(a3)\rightarrow b} (r1\bowtie_{c1 \o c2} r2)))$$
+$$
+    \pi_{a1, a2, b}(\sigma_{h1\land h2}(\Gamma_{g1, g2, COUNT(a3)\rightarrow b} (r1\bowtie_{c1 \lor c2} r2)))
+$$
 \bigskip
-$$j := r_1\bowtie_{c_1 \o c_2} r_2$$
-$$\pi_{a_1, a_2, b}(\sigma_{h_1\a h_2}(\Gamma_{g_1, g_2, COUNT(a_3)\rightarrow b} (j)))$$
+$$j := r_1\bowtie_{c_1 \lor c_2} r_2$$
+$$\pi_{a_1, a_2, b}(\sigma_{h_1\land h_2}(\Gamma_{g_1, g_2, COUNT(a_3)\rightarrow b} (j)))$$
 \end{frame}
 
 \begin{frame}{Literatúra}
 \begin{itemize}
 \item {\scriptsize\url{https://www.db-book.com/slides-dir/PDF-dir/ch2.pdf}}
+\item {\scriptsize\url{https://drive.google.com/file/d/1IwVFcAWWDD_fAJAOZruXdlS3Onh3XinP/view}}
+\item {\scriptsize\url{https://cs186berkeley.net/notes/note6/}}
 \item {\scriptsize\url{https://dbis-uibk.github.io/relax/calc/gist/379b0fdd72490e8e634bb193f109d4a8}}
 \end{itemize}
 \end{frame}
