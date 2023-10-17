@@ -7,10 +7,10 @@ Daná je databáza
 	navstivil(Id, Pijan, Krcma, Od),
 	vypil(Id, Alkohol, Mnozstvo).
 ```
-Atribút `Id` v reláciách `navstivil` a `vypil` je identifikátorom návštevy; každá návšteva zahŕňa práve jedného pijana a práve jednu krčmu. Atribút `Od` udáva čas, kedy návšteva začala. V každom momente môže byť pijan v nanajvýš jednej krčme. 
+Atribút `Id` v reláciách `navstivil` a `vypil` je identifikátorom návštevy; každá návšteva zahŕňa práve jedného pijana a práve jednu krčmu. Atribút `Od` udáva čas, kedy návšteva začala. V každom momente môže byť pijan v nanajvýš jednej krčme.
 
 Atribút `Cena` udáva cenu daného alkoholu v danej krčme (ceny sa nemenia). Každá krčma čapuje aspoň jeden alkohol.
-Atribút `Mnozstvo` je celkové množstvo alkohol vypitého pri danej návšteve (pre každú dvojicu `Id, Alkohol` je vo `vypil` nanajvýš jeden záznam); platí `Mnozstvo > 0`. 
+Atribút `Mnozstvo` je celkové množstvo alkohol vypitého pri danej návšteve (pre každú dvojicu `Id, Alkohol` je vo `vypil` nanajvýš jeden záznam); platí `Mnozstvo > 0`.
 Vo `vypil` sú zaznamenané len alkoholy, ktoré čapuje navštívená krčma.
 
 Môžete predpokladať, že databáza neobsahuje žiaden spor (napr. rôzni pijani pre jednu hodnotu `Id` v `navstivil`).
@@ -38,15 +38,14 @@ jedno posedenie. Usporiadajte ich podľa P a A.
 
 ### Technické pokyny
 
-* Termín na odovzdanie: **4. 12. 2022**
+* Termín na odovzdanie: **6. 11. 2023**
 * Používajte korektnú syntax SQL podporovanú databázou SQLite 3.34 (overiť si to môžete trebárs na serveri `cvika.dcs.fmph.uniba.sk`). Riešenia so syntaktickými chybami budú hodnotené len minimálnym počtom bodov.
 * Každý dotaz aj s pomocnými reláciami zapíšte do osobitného súboru s príponou `.sql` pomenovaného písmenom zodpovedajúcim zadanému dotazu (napr. `a.sql`). Okrem komentárov by v ňom nemalo byť nič navyše.
-* Súbory `a.sql`, `b.sql`, `c.sql`, `d.sql` odošlite ako prílohu e-mailu na adresu `mazak.fmfi@gmail.com` s predmetom `databazove systemy -- du1`. Tento e-mail musí v tele obsahovať vaše celé meno.
-* Na usporiadaní výsledku dotazu nijako zásadne nezáleží, ale uľahčuje porovnávanie; proste použite `ORDER BY <comma-separated list of column names>` (v tom zozname stĺpcov treba zachovať poradie zo zadania).
+* Súbory `a.sql`, `b.sql`, `c.sql`, `d.sql` odošlite ako prílohu e-mailu na adresu `jan.mazak@fmph.uniba.sk` s predmetom `DAV-DU1`. Tento e-mail musí v tele obsahovať vaše meno.
+* Na usporiadaní výsledku dotazu síce zásadne nezáleží, ale robí výsledok deterministickým, preto nezabudnite na príslušný `ORDER BY`.
 
 ### Overenie správnosti riešení
 
 Správnosť riešenia si môžete overiť pre databázu [pijani.sql](testdata/pijani.sql).
 Správne odpovede na dotazy nájdete v súbore [pijani_answers.txt](testdata/pijani_answers.txt).
-(Je dosť možné, že som niečo pri príprave týchto súborov domotal; napíšte mi e-mail, ak objavíte problém.)
 
