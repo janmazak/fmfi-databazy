@@ -211,21 +211,6 @@ print_db_sql()
 
 # (a)
 """
-WITH nv AS (
-	SELECT *
-	FROM navstivil
-	NATURAL JOIN vypil
-)
-SELECT DISTINCT nv.Pijan, nv.Krcma
-FROM nv
-WHERE NOT EXISTS (
-	SELECT nv2.Alkohol
-	FROM nv nv2, nv nv3
-	WHERE nv2.Pijan = nv.Pijan AND nv2.Krcma = nv.Krcma
-	AND nv3.Pijan = nv2.Pijan AND nv3.Alkohol = nv2.Alkohol AND nv3.Krcma <> nv2.Krcma AND nv3.Od > nv2.Od
-)
-ORDER BY nv.Pijan, nv.Krcma;
-
 ['[a_p1,default_k01]', '[a_p2,default_k01]', '[a_p2,default_k02]', '[a_p2,default_k03]', '[a_p2,default_k04]', '[b_p000,default_k03]', '[b_p001,default_k09]', '[b_p002,default_k05]', '[b_p003,default_k09]', '[b_p004,default_k01]', '[default_p02,default_k09]', '[default_p09,default_k01]']
 """
 
