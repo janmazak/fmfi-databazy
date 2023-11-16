@@ -251,6 +251,26 @@ Keďže sa do nej nedajú vložiť záznamy $(a_1, b_1, c_1)$ a $(a_1, b_1, c_2)
 \end{frame}
 
 \begin{frame}[fragile]{Funkčné závislosti}
+Aké funkčné závislosti musia platiť pre nasledujúcu reláciu? (Hľadáme závislosti vynútené SQL kódom.)
+\begin{alltt}
+    CREATE TABLE customers (
+        id        integer PRIMARY KEY,     ---- I
+        address   text NOT NULL,           ---- A
+        name      text NOT NULL,           ---- N
+        email     text NOT NULL UNIQUE,    ---- E
+        phone     text NOT NULL UNIQUE,    ---- P
+        UNIQUE(name, address)
+    );
+\end{alltt}
+\pause
+\begin{itemize}
+\item PRIMARY KEY: $I\fz ANEP$
+\item UNIQUE: $E\fz I$, $P\fz I$, $AN\fz I$
+\item Z významu stĺpcov to vyzerá tak, že iné FZ (okrem tých, čo vyplývajú z uvedených) už medzi týmito atribútmi nie sú (a nechceme ich v SQL vynucovať).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Funkčné závislosti}
 Funkčné závislosti treba vnímať so všetkými ich dôsledkami. Predpokladajme, že platí
 $$
 A\fz C,\quad B\fz D,\quad CD\fz E.
