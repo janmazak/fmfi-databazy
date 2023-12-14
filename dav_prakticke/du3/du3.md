@@ -14,7 +14,7 @@ Vytvorenie pomocou `CREATE TRIGGER` pridajte do súboru `testy.sql`, v ktorom m�
 
 Rozšírte tabuľku študentov o unikátne prihlasovacie meno, t.j. nejaký textový identifikátor študenta (heslo budeme pre jednoduchosť ignorovať).
 
-Vytvorte program v Pythone (v jedinom súbore `testy.py`) s nasledovnou funkcionalitou:
+Vytvorte program v Pythone (v jedinom súbore `testy.py`) s nasledujúcou funkcionalitou:
 * Interaktívne komunikuje s užívateľom cez terminál (konzolu).
 * Po spustení si vyžiada prihlasovacie meno študenta; ak sa nenašlo, opakovane si ho bude pýtať znovu.
 * Po zadaní existujúceho prihlasovacieho mena program vypíše zoznam testov pridelených študentovi vrátane doteraz najlepšieho vypracovania ku každému testu (t.j. s najvyšším skóre) a študent zadaním poradového čísla vyberie test, ktorý ide vypracovať.
@@ -31,7 +31,7 @@ Váš programovací štýl nemusí byť zďaleka dokonalý, ale snažte sa drža
 
 #### Dáta na vyskúšanie
 
-Do súboru `testy.sql` doplňte pridanie testu s názvom `Trivia` a nasledovnými otázkami (správna odpoveď je označená hviezdičkou):
+Do súboru `testy.sql` doplňte pridanie testu s názvom `Trivia` a týmito otázkami (správna odpoveď je označená hviezdičkou):
 ```
 Which of the following is not an international organisation?
 A. FIFA

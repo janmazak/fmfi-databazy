@@ -17,7 +17,7 @@ R = (C,         T,            D,               V,         S,        Y,
      B,         R,            N,               X,         L).
 ```
 
-V relácii R platia nasledovné funkčné závislosti:
+V relácii R platia tieto funkčné závislosti:
 * `C -> TDV` (ak vieme ID kurzu, poznáme jeho názov, katedru, pod ktorú patrí, aj priradené kredity)
 * `BR -> N` (miestnosť má jednoznačne určenú kapacitu)
 * `CSY -> BRXL` (v danom roku a semestri má kurz priradenú miestnosť, hodiny v rozvrhu aj prednášajúceho)

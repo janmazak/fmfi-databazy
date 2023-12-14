@@ -63,7 +63,7 @@ Borrowing of several books is allowed, but they must all be of the same author, 
 
 /*
 
-Uvazujme nasledovnu databazovu schemu:
+Uvazujme nasledujucu databazovu schemu:
 
 citatel(Ic, Meno, DatumRegistracie)      // Ic je unikatne id citatela
 kniha(Ik, Nazov, Autor)                  // Ik je unikatne id knihy

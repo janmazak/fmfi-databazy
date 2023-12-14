@@ -221,7 +221,7 @@ CREATE TABLE ta (
 \begin{frame}[fragile]{Primary keys}
 Pre niektoré tabuľky nemáme žiadnych prirodzených kandidátov na primárny kľúč
 (napr. ak tabuľka len zachytáva vzťah M:N). Vtedy môžeme pridať ako primárny kľúč
-\alert{umelý identifikátor}, ktorý jednoznačne identifikuje záznam.
+\alert{surrogate key} --- umelý identifikátor, ktorý jednoznačne identifikuje záznam.
 
 \begin{itemize}
 \item PostgreSQL: SERIAL.
@@ -419,6 +419,18 @@ Nájdená dekompozícia je bezstratová a zachováva FZ.
 
 \bigskip
 Schéma vytvorená na základe dobrého entitno-relačného modelu je zväčša už v 3NF.
+\end{frame}
+
+\begin{frame}[fragile]{NF a surrogate keys}
+Pridanie umelého id $I$ nemení spĺňanie normálnej formy:
+\begin{itemize}
+\item Ak nejaká FZ pred pridaním $I$ porušovala NF, porušuje ju naďalej.
+\item Ak nejaká FZ pred pridaním $I$ neporušovala NF, nebude ju porušovať
+    (pre 3NF a BCNF to vidno z toho, že každý pôvodný kľúč ostáva kľúčom, keďže z neho \uv{vyplýva} $I$).
+\item NF nemôže porušovať závislosť, ktorá má $I$ na ľavej strane (lebo samotné $I$ je nadkľúč).
+\item NF nemôže porušovať závislosť, ktorá má $I$ na pravej strane,
+lebo každá množina atribútov, z ktorej \uv{vyplýva} $I$, je nadkľúčom (keďže z $I$ \uv{vyplýva} všetko).
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Normalizácia}
