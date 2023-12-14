@@ -5,7 +5,7 @@ V rámci e-learningového systému môžu učitelia vytvárať testy, prideľova
 * Učiteľ môže vytvoriť test pozostávajúci z niekoľkých otázok (ľubovoľne veľa); potrebujeme evidovať názov testu, autora (učiteľ) a otázky, ktoré daný test obsahuje.
 * Otázka pozostáva z textu zadania a textov správnej odpovede a nesprávnych odpovedí. Jedna otázka môže byť súčasťou viacerých testov.
 * Pri pridelení testu žiakovi (daný test možno danému žiakovi prideliť jediný raz) treba evidovať, ktorý učiteľ test pridelil a čas, kedy bol test pridelený.
-* Po vypracovaní prideleného testu chceme zaznamenať študentove odpovede: potrebujeme vedieť, o ktoré pridelenie testu ide, čas vypracovania testu a odpovede na tie otázky, pre ktoré si žiak vybral niektorú z možných odpovedí (študent môže v rámci jedného pridelenia absolvovať test ľubovoľne veľa ráz). Nie je prípustné evidovať dve vypracovania v tom istom čase.
+* Po vypracovaní prideleného testu chceme zaznamenať študentove odpovede: potrebujeme vedieť, o ktoré pridelenie testu ide, čas vypracovania testu a odpovede na tie otázky, pre ktoré si žiak vybral niektorú z možných odpovedí (študent môže v rámci jedného pridelenia absolvovať test ľubovoľne veľa ráz). Nie je prípustné evidovať dve vypracovania pre jedného študenta v tom istom čase (v rovnakom čase však môžu byť vypracované testy rôznych študentov).
 * Pri vypracovávaní prideleného testu žiak zvolil pre niektoré otázky testu jednu z možných odpovedí. Pre každé vypracovanie testu chceme evidovať, ktoré odpovede žiak zvolil.
 
 ---
