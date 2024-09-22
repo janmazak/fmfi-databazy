@@ -45,6 +45,43 @@
 
 \frame{\titlepage}
 
+\begin{frame}{Tento predmet}
+\begin{itemize}
+\item zameraný najmä na praktické aspekty práce s relačnými DBMS
+\item dotazy
+\item navrhovanie databázových schém v relačnom modeli
+\item transakcie
+\item efektivita (význam indexov, vkladanie veľkých objemov dát)
+\pause
+\item ale aj prehľad o teoretických aspektoch (vyjadrovacia sila dotazovacích jazykov, zložitosť vybraných algoritmov)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hodnotenie}
+\begin{itemize}
+\item účasť na prednáškach ani cvičeniach nie je povinná
+\item prednášky neraz zahŕňajú aj \uv{teoretické precvičenie}
+\pause
+\item na známku E treba 60\% bodov zo všetkého
+\item cvičenia sú praktické, vhodné na samostatnú či skupinovú prácu
+    (aspoň 10 x 2 b, treba min. 12)
+\item tri domáce úlohy (3 x 15 b, treba min. 27)
+\item písomka z dotazov (10 b, treba min. 6)
+\item ústna skúška (25 b, treba min. 15)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Využívanie LLM}
+Vyskúšajte prácu s ChatGPT či iným LLM:
+\begin{itemize}
+\item nechajte si nejakú tému či detail vysvetliť
+\item nechajte ho klásť vám otázky k učivu
+\item rozpory medzi tvrdeniami LLM a inými materiálmi možno diskutovať na prednáške
+\pause
+\item môžete si nechať kontrolovať dotazy, príp. vyžiadať si alternatívne riešenia a nechať LLM posúdiť ich výhody/nevýhody
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Čo je databáza?}
 \begin{itemize}
 \item kolekcia údajov
@@ -52,7 +89,6 @@
 \end{itemize}
 \vskip 1cm
 \pause
-
 DBMS (database management system), voľne tiež databáza
 \begin{itemize}
 \item obsahuje veci spoločné pre jednotlivé databázy
@@ -117,6 +153,7 @@ Dáta v tabuľkách; stĺpce sú atribúty, riadky záznamy.
 Záznamy z rôznych tabuliek sa prepájajú operáciou JOIN.
 \end{frame}
 
+% TODO vseob. o vyjadrovacej sile dotazovacich jazykov?
 \begin{frame}{Databázové jazyky}
 \begin{itemize}
 \item Data Query Language (DQL) --- dotazy
@@ -145,7 +182,7 @@ Prístup k dátam z programovacích jazykov:
 \end{frame}
 
 \begin{frame}{Nevhodnosť prirodzeného jazyka}
-Ľudia neraz veci kvantifikujú nesprávne alebo neúplne (zvlášť pozor na ľudí pôsobiacich v inom odvetví, kde nepoznáte konvencie).
+Ľudia neraz veci kvantifikujú nesprávne alebo neúplne (zvlášť pozor na ľudí pôsobiacich v odvetví, kde nepoznáte konvencie).
 Ako interpretovať tvrdenie \uv{chlieb predávajú v potravinách}?
 \pause
 \begin{itemize}
@@ -210,7 +247,8 @@ Alkoholy, ktoré ľúbi každý pijan (ktorý niečo ľúbi), čapujú ich všad
 \item 1986: prvý štandard SQL
 \item od cca 2010: NoSQL, Spark...
 \pause
-\item reálne systémy nedržia tempo s teóriou ani SQL štandardmi, napr. rekurzia je v najväčších DBMS implementovaná ani 10 rokov, kým štandard je z 1999
+\item reálne systémy nedržia tempo s teóriou ani SQL štandardmi,
+    napr. rekurzia je v najväčších DBMS implementovaná asi 10 rokov, kým štandard je z 1999
 \item a naopak k NoSQL systémom chýba univerzálna formálna teória (sú rôznorodé)
 \end{itemize}
 \end{frame}
@@ -259,29 +297,27 @@ SQLite
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Tento predmet}
+\begin{frame}{DBMS pre dátovú vedu}
 \begin{itemize}
-\item zameraný najmä na praktické aspekty práce s relačnými DBMS
-\item dotazy
-\item navrhovanie databázových schém v relačnom modeli
-\item transakcie
-\item efektivita (význam indexov, vkladanie veľkých objemov dát)
-\pause
-\item ale aj prehľad o teoretických aspektoch (vyjadrovacia sila dotazovacích jazykov, zložitosť vybraných algoritmov)
+\item aj niektoré nie-relačné databázy podporujú jazyk SQL\\
+    (napr. Apache Spark, Hadoop)
+\item nie-relačné databázy môžu zvýšiť výkon v špeciálnych prípadoch, inak všetko vieme spraviť aj s relačnou db
+\item limity tabuľky v PostgreSQL: 32 TB dát,\\ miliardy riadkov, 1600 stĺpcov
+\item miesto komplikovanej distribuovanej db zvážiť zjednodušenie dátového modelu, aby bol zvládnuteľný v PostgreSQL (aspoň pre účely analýzy dát)
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Hodnotenie}
+\begin{frame}{SQLite fun facts}
+% https://x.com/iavins/status/1774464622067679738?t=8j2QHz615aDr4k5rFwzBow&s=03
 \begin{itemize}
-\item účasť na prednáškach ani cvičeniach nie je povinná
-\item prednášky zväčša zahŕňajú aj \uv{teoretické precvičenie}
-\item cvičenia sú praktické, dajú sa robiť samostatne vo zvolenom čase; z každého treba spraviť aspoň časť\\ (10 x 2 b, treba min. 15)
-\item tri domáce úlohy (3 x 20 b, treba min. 25)
-\item ústna skúška za 20 bodov, treba min. 10
+\item viac ako $10^{12}$ existujúcich SQLite databáz
+\item open source, ale nie open contribution\\ --- len 3 developeri
+\item kód v C, cca 160 000 riadkov
+\item 600 riadkov testov na každý riadok vlastného kódu
+\item 100\% pokrytie možných vetiev v kóde
+\item aké situácie testujú? inšpirujte sa: \url{https://www.sqlite.org/testing.html}
 \end{itemize}
 \end{frame}
-
 
 \begin{frame}{Literatúra}
 \begin{itemize}
