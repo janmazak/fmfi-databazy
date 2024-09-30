@@ -93,11 +93,12 @@ Nehádajte, použite dokumentáciu.
 \begin{frame}[fragile]{Dotazy v SQL}
 Základná štruktúra:
 \begin{verbatim}
-SELECT attr1 AS a1, attr2 AS a2
+SELECT attribute1 AS a1, attribute2 AS a2
 FROM table AS t
-WHERE t.a2 > 10
-ORDER BY attr1, attr2
+WHERE t.attribute2 > 10
+ORDER BY attribute1, attribute2
 \end{verbatim}
+(Všimnite si, že aliasy a1, a2 nemožno použiť nikde vnútri dotazu. Kľúčové slovo AS je takmer všade nepovinné.)
 \end{frame}
 
 \begin{frame}[fragile]{Dotazy v SQL}
@@ -122,14 +123,14 @@ Vo výsledku nemusia byť len pôvodné hodnoty atribútov, ale aj čosi z nich 
 \begin{verbatim}
 SELECT
     concat(e.firstname,' ',e.lastname) AS ename,
+    0.8 * e.salary AS salaryAfterTax
     (CASE
-        WHEN e.comm IS NULL THEN e.sal
-        ELSE e.comm + e.sal
+        WHEN e.bonus IS NULL THEN e.salary
+        ELSE e.bonus + e.salary
     ) AS total_salary,
-    0.8 * e.sal AS salaryAfterTax
 FROM emp AS e
-WHERE deptno >= 20 AND lower(e.firstname) = 'john'
-LIMIT 1 OFFSET 7
+WHERE deptno >= 20 AND lower(e.firstname) = 'John'
+ORDER BY 0.8 * e.salary
 \end{verbatim}
 \end{frame}
 
@@ -167,11 +168,28 @@ Negáciu možno vyjadriť pomocou vnoreného dotazu (subquery) a \alert{NOT EXIS
 /* zamestnanci, ktorí nemajú podriadených */
 SELECT emp.name FROM employee \blue{emp}
 WHERE \alert{NOT EXISTS} (
-    SELECT 1 FROM employee \green{e2}
-    WHERE \green{e2}.superior_id = \blue{emp}.employee_id
+    SELECT 1 FROM employee \green{emp2}
+    WHERE \green{emp2}.superior_id = \blue{emp}.employee_id
 )
 \end{alltt}
 (Nezáleží na tom, ktoré stĺpce sú vymenované za SELECT vo vnútornom dotaze, pretože EXISTS len testuje, či sa tam nachádza aspoň jeden riadok.)
+\end{frame}
+
+\begin{frame}[fragile]{Negácia}
+Samotný operátor EXISTS bez NOT je ekvivalentný joinu.
+\begin{alltt}
+/* zamestnanci, ktorí majú podriadených */
+SELECT DISTINCT emp.name
+FROM employee \blue{emp}
+WHERE \alert{EXISTS} (
+    SELECT 1 FROM employee \green{emp2}
+    WHERE \green{emp2}.superior_id = \blue{emp}.employee_id
+)
+
+SELECT DISTINCT emp.name
+FROM employee \blue{emp}, employee \green{emp2}
+WHERE \green{emp2}.superior_id = \blue{emp}.employee_id
+\end{alltt}
 \end{frame}
 
 \begin{frame}[fragile]{Všeobecný kvantifikátor}
@@ -180,14 +198,84 @@ Postupovať možno v duchu
 $$
     \forall x\ P(x)\qquad \Leftrightarrow\qquad \lnot\ \exists x\ \lnot\, P(x).
 $$
-Zamestnanci, ktorí majú plat aspoň taký ako \alert{všetci} ostatní $\Leftrightarrow$ zamestnanci, ku ktorým neexistuje zamestnanec s vyšším platom.
+Zamestnanci, ktorí majú vyšší plat ako \alert{všetci} ostatní $\Leftrightarrow$ zamestnanci, ku ktorým neexistuje zamestnanec s vyšším či rovným platom.
 \begin{alltt}
 SELECT e.name
 FROM employee e
 WHERE \blue{NOT EXISTS} (SELECT 1
                   FROM employee e2
-                  WHERE e2.salary > e.salary)
+                  WHERE e2.salary >= e.salary)
 \end{alltt}
+\end{frame}
+
+\begin{frame}{Množinové operácie}
+\begin{itemize}
+\item EXCEPT --- rozdiel množín
+\item EXCEPT ALL --- rozdiel množín
+\item UNION --- zjednotenie (bez zachovania duplicity riadkov)
+\item UNION ALL --- zjednotenie (so zachovaním duplicity riadkov)
+\item INTERSECT --- prienik
+\item INTERSECT ALL --- prienik % TODO
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Množinové operácie}
+\begin{minipage}{.4\pdfpagewidth}
+\begin{alltt}
+SELECT nazov
+FROM kry
+
+\alert{UNION}
+
+SELECT nazov
+FROM stromy
+\end{alltt}
+\end{minipage}
+\begin{minipage}{.4\pdfpagewidth}
+\begin{alltt}
+SELECT nazov
+FROM dreviny
+
+\alert{EXCEPT}
+
+SELECT nazov
+FROM stromy
+\end{alltt}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[fragile]{Zoradenie záznamov}
+Zoznam zamestnancov usporiadaný od najvyššieho platu po najnižší, pri rovnakom plate abecedne:
+\begin{alltt}
+SELECT name, salary, department
+FROM employee
+\alert{ORDER BY} salary DESC, name ASC
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy (subqueries)}
+Okrem operátora EXISTS sa možno pomocou operátora IN (resp. NOT IN) pýtať na prítomnosť v množine.
+\begin{alltt}
+SELECT name
+FROM employee e
+WHERE e.deptno \alert{IN} (SELECT deptno
+                   FROM department d
+                   WHERE d.location = 'New York')
+\end{alltt}
+IN sa optimalizuje horšie ako join a antijoin (NOT EXISTS), dá sa však v prípade potreby prepísať pomocou iných operátorov.
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy (subqueries)}
+Ak je výsledkom vnoreného dotazu tabuľka 1x1, možno ju použiť ako skalár.
+\begin{alltt}
+SELECT name
+FROM employee e
+WHERE \alert{e.deptno =} \blue{(SELECT deptno
+                  FROM department d
+                  WHERE d.location = 'New York')}
+\end{alltt}
+Ak by vo vnorenom dotaze vyšlo viac riadkov (alebo žiaden), dôjde k chybe.\\
+(Takýmto chybám treba čo najviac predchádzať, napr. použitím UNIQUE už pri vytváraní tabuľky.)
 \end{frame}
 
 \begin{frame}[fragile]{CREATE TEMPORARY TABLE}
@@ -200,36 +288,51 @@ Používateľ si vie sám vytvoriť dočasnú tabuľku, ktorá zanikne po odpoje
     FROM employee e, department d
     WHERE e.deptno = d.deptno
 );
-SELECT * FROM \blue{employee_details};
+SELECT * FROM \blue{employee_details} WHERE ...;
 \end{alltt}
 Hodí sa to napr. ak chceme opakovane využívať ten istý komplikovaný join.
 \end{frame}
 
+
+\begin{frame}[fragile]{VIEW}
+Používateľom možno uľahčiť prístup k dátam vytvorením náhľadu (VIEW), ktorý je iný ako samotné definície tabuliek.
+\begin{alltt}
+\alert{CREATE VIEW} \blue{employee_details} AS (
+    SELECT e.empno, e.name, e.deptno,
+           d.name, d.location
+    FROM employee e, department d
+    WHERE e.deptno = d.deptno
+)
+
+SELECT * FROM \blue{employee_details} WHERE ...;
+\end{alltt}
+VIEW je permanentný objekt v db. Možno cezeň aj vkladať dáta, ale nerobte to (veľa komplikácií s NULL).
+\end{frame}
 
 \begin{frame}{Literatúra}
 \begin{itemize}
 \item {\scriptsize\url{https://cs186berkeley.net/notes/note1/}}
 \item {\scriptsize\url{https://cs186berkeley.net/notes/note2/}}
 \item {\scriptsize\url{https://www.postgresqltutorial.com/} (Sections 1, 2, 3)}
-\item {\scriptsize\url{https://drive.google.com/file/d/1HCq2KMZ05UvtXGe1nTqNmkwhc3X-NLI3/view}}
 \item {\scriptsize\url{https://www.w3schools.com/sql/sql_intro.asp}}
 \item {\scriptsize\url{https://sqlbolt.com/lesson/select_queries_introduction}}
 \item {\scriptsize\url{https://www.learnsqlonline.org/}}
+\item {\scriptsize\url{https://www.postgresqltutorial.com/postgresql-views/managing-postgresql-views/}}
+\item {\scriptsize\url{https://drive.google.com/file/d/1HCq2KMZ05UvtXGe1nTqNmkwhc3X-NLI3/view}}
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Úlohy: SQL}
-Databáza: \emph{osoba}(A), \emph{pozna}(Kto, Koho)
+Databáza: \emph{osoba}(meno), \emph{pozna}(kto, koho)
 \begin{itemize}
-	\item všetky osoby
     \item osoby, ktoré poznajú sysľa
     \item osoby, ktoré poznajú aspoň dve entity\\ (nemusia to byť osoby)
     \item osoby, ktoré nepoznajú nič a nikoho
     \item osoby, ktoré nepoznajú žiadne iné osoby
     \item osoby, ktoré poznajú iba Jožka
     \item osoby, ktoré pozná presne jedna osoba
-%    \item osoby, ktoré poznajú všetkých známych svojich známych
+    \item osoby, ktoré poznajú všetkých známych svojich známych
 %    \item osoby, ktoré majú všetky vzťahy symetrické
 \end{itemize}
 \end{frame}
