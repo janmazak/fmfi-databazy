@@ -1,11 +1,4 @@
 DROP TABLE IF EXISTS employee;
-DROP TABLE IF EXISTS department;
-
-CREATE TABLE department(
-   deptno INTEGER PRIMARY KEY,
-   name VARCHAR(50) NOT NULL,
-   location VARCHAR(50) NOT NULL
-);
 
 CREATE TABLE employee(
    empno INTEGER PRIMARY KEY,
@@ -16,13 +9,6 @@ CREATE TABLE employee(
    salary DECIMAL(10,2),
    deptno INTEGER NOT NULL
 );
-
-
-insert into department values (10, 'Accounting', 'New York');
-insert into department values (20, 'Research', 'Dallas');
-insert into department values (30, 'Sales', 'Chicago');
-insert into department values (40, 'Operations', 'Boston');
-
 
 insert into employee values (11, 'King', 'president', null, '1990-06-09', 5000, 10);
 insert into employee values (12, 'Blake', 'manager', 11, '1992-06-11', 2850, 30);
