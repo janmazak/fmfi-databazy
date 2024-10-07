@@ -1,0 +1,175 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+
+\documentclass[12pt]{beamer}
+\usetheme{default}
+\usecolortheme{crane}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovak]{babel}
+\usepackage{ucs} % unicode
+
+\usepackage{amsmath}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref, url}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{alltt}
+
+%\setbeamersize{text margin left=1pt,text margin right=1pt}
+\setbeamertemplate{footline}[frame number]
+\beamertemplatenavigationsymbolsempty
+
+% https://www.overleaf.com/learn/latex/Using_colours_in_LaTeX
+\def\blue#1{\textcolor{Cerulean}{#1}}
+\def\green#1{\textcolor{LimeGreen}{#1}}
+
+% database-related stuff
+\DeclareMathOperator{\join}{\bowtie}
+\DeclareMathOperator{\antijoin}{\rhd}
+
+\DeclareMathOperator{\lubi}{lubi}
+\DeclareMathOperator{\capuje}{capuje}
+\DeclareMathOperator{\navstivil}{navstivil}
+\DeclareMathOperator{\vypil}{vypil}
+\DeclareMathOperator{\answer}{answer}
+
+
+\title{Agregácia v SQL}
+\author{Ján Mazák}
+\institute{FMFI UK Bratislava}
+\date{}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+
+\begin{frame}[fragile]{Agregácia}
+Niekedy nás nezaujímajú jednotlivé záznamy relácie, ale jedna agregátna hodnota.
+\begin{alltt}
+/* počet zamestnancov */
+
+SELECT \alert{COUNT}(e.empno)
+FROM employee e
+\end{alltt}
+Agregačné funkcie: COUNT, SUM, AVG, MAX, MIN\dots
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia}
+Riadky možno rozdeliť do skupín pomocou \alert{GROUP BY}.\\
+Na výstupe bude pre každú skupinu 1 riadok.
+\begin{alltt}
+/* počet zamestnancov v jednotlivých oddeleniach */
+
+SELECT e.deptno, \alert{COUNT}(e.empno) AS c
+FROM employee e
+\alert{GROUP BY} e.deptno
+\blue{HAVING} COUNT(e.empno) > 1
+\end{alltt}
+\bigskip
+\blue{HAVING} umožňuje filtrovať skupiny.\\
+(Pomenovanie atribútov vytvorených agregáciou za SELECT sa nedá použiť za \blue{HAVING}.)
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia}
+Mimo dotazu môžu ísť len agregované hodnoty a atribúty, na ktorých sa všetky záznamy v skupine zhodujú
+(toto je z pohľadu databázy zaručené len vtedy, ak sa ten atribút nachádza za GROUP BY).
+\begin{alltt}
+/* počet zamestnancov v jednotlivých oddeleniach */
+
+SELECT \blue{d.name}, \alert{COUNT}(e.empno) AS c
+FROM employee e
+    JOIN department d ON e.deptno = d.deptno
+\alert{GROUP BY} d.deptno, \blue{d.name}
+\end{alltt}
+(Pridanie \verb|d.name| nemá vplyv na rozdelenie riadkov do skupín.)
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia}
+Do skupín možno deliť aj podľa viacerých atribútov súčasne (riadky v skupine sa musia zhodovať na všetkých).
+\begin{alltt}
+/* počet zamestnancov v skupinách podľa platu
+v jednotlivých oddeleniach */
+
+SELECT d.name, d.salary, \alert{COUNT}(e.empno) AS c
+FROM employee e
+    JOIN department d ON e.deptno = d.deptno
+\alert{GROUP BY} d.deptno, d.name, e.salary
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia}
+Postupujte opatrne pri aplikovaní agregačných funkcií na NULL a na potenciálne prázdnu množinu záznamov.
+Výsledky neraz nie sú intuitívne, treba podrobne naštudovať dokumentáciu a overiť správanie pre konkrétny DBMS.
+Napríklad:
+\begin{itemize}
+\item \verb|COUNT(stĺpec)| ignoruje NULL, ale \verb|COUNT(*)| ich zaráta (aspoň v MySQL)
+\item AVG pre neprázdnu množinu ignoruje NULL a výsledok tak môže byť veľmi nereprezentatívny; pre prázdnu vráti NULL
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WITH --- Common Table Expressions (CTE)}
+WITH vytvorí reláciu existujúcu len počas výpočtu dotazu.
+\bigskip
+\begin{alltt}
+\alert{WITH} \blue{pijanPocetAlkoholov}(pijan, c) AS (
+    SELECT pijan, COUNT(DISTINCT alkohol)
+    FROM lubi
+)
+SELECT MAX(ppa.c)
+FROM \blue{pijanPocetAlkoholov} ppa
+\end{alltt}
+\bigskip
+WITH sa často používa pri viackrokovom agregovaní.
+V jednom dotaze možno za WITH vymenovať aj viacero relácií oddelených čiarkou.
+\end{frame}
+
+\begin{frame}[fragile]{Záznamy, kde sa dosahuje extrém (arg max)}
+\begin{alltt}
+\alert{WITH} \blue{pijanPocetAlkoholov}(pijan, c) AS (
+    SELECT pijan, COUNT(DISTINCT alkohol)
+    FROM lubi
+)
+SELECT ppa.pijan
+FROM \blue{pijanPocetAlkoholov} ppa
+WHERE ppa.c = (
+    SELECT MAX(ppa2.c)
+    FROM \blue{pijanPocetAlkoholov} ppa2
+)
+\end{alltt}
+\bigskip
+\end{frame}
+
+
+\begin{frame}{Literatúra}
+\begin{itemize}
+\item {\scriptsize\url{https://www.postgresqltutorial.com/postgresql-aggregate-functions/}}
+\item {\scriptsize\url{https://www.postgresqltutorial.com/} (Sections 4, 5, 7)}
+\item {\scriptsize\url{https://learnsql.com/blog/error-with-group-by/}}
+\item {\scriptsize\url{https://www.postgresql.org/docs/current/functions-aggregate.html}}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Úlohy: SQL}
+Databáza: \emph{lubi}(Pijan, Alkohol), \emph{capuje}(Krcma, Alkohol, Cena),
+\emph{navstivil}(Id, Pijan, Krcma), \emph{vypil}(Id, Alkohol, Mnozstvo)
+\begin{itemize}
+	\item počet čapovaných alkoholov
+	\item priemerná cena piva
+	\item najdrahší čapovaný alkohol (všetky, ak ich je viac)
+    \item pijan, ktorý vypil najmenej druhov alkoholu
+	\item tržby jednotlivých krčiem
+    \item krčma s najväčšou celkovou tržbou
+    \item priem. suma prepitá pri 1 návšteve pre jednotlivé krčmy
+    \item koľko najviac alkoholov, ktoré nik neľúbi, je v jednej krčme v ponuke?
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+
+
