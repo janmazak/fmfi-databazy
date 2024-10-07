@@ -1,39 +1,39 @@
 -- Note that we drop the tables in the reverse order because
--- we don't want to e.g. delete employees before deleting projects assigned to them .
+-- we don't want to e.g. delete employees before deleting projects assigned to them.
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS employee;
 DROP TABLE IF EXISTS department;
 
 CREATE TABLE department (
-   deptno INTEGER PRIMARY KEY,
+   dept_id INTEGER PRIMARY KEY,
    name VARCHAR(50) NOT NULL,
    location VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE employee (
-   empno INTEGER PRIMARY KEY,
+   emp_id INTEGER PRIMARY KEY,
    name VARCHAR(50) NOT NULL,
    job VARCHAR(50) NOT NULL,
    superior INTEGER,
    hiredate DATE,
    salary DECIMAL(10,2),
-   deptno INTEGER NOT NULL
+   dept_id INTEGER NOT NULL
 );
 
 -- Note that if several employees work on a project, the record for each employee
 -- contains the name of the project; this redundancy is an example of a bad practice.
 -- Later, we learn how to avoid that.
 CREATE TABLE project (
-   projno INTEGER NOT NULL,
+   proj_id INTEGER NOT NULL,
    name VARCHAR(50) NOT NULL,
-   empno INTEGER NOT NULL
+   emp_id INTEGER NOT NULL
 );
 
 
 insert into department values (10, 'Accounting', 'New York');
 insert into department values (20, 'Research', 'Dallas');
 insert into department values (30, 'Sales', 'Chicago');
-insert into department values (40, 'Operations', 'Boston');   
+insert into department values (40, 'Operations', 'Boston');
 
 
 insert into employee values (11, 'King', 'president', null, '1990-06-09', 5000, 10);
@@ -56,4 +56,3 @@ insert into project values (1, 'Enviro1', 21);
 insert into project values (2, 'Enviro2', 14);
 insert into project values (3, 'Nuclear1', 14);
 insert into project values (3, 'Nuclear1', 17);
-
