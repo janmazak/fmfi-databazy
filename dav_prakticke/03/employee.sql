@@ -5,28 +5,28 @@ DROP TABLE IF EXISTS employee;
 DROP TABLE IF EXISTS department;
 
 CREATE TABLE department (
-   deptno INTEGER PRIMARY KEY,
+   dept_id INTEGER PRIMARY KEY,
    name VARCHAR(50) NOT NULL,
    location VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE employee (
-   empno INTEGER PRIMARY KEY,
+   emp_id INTEGER PRIMARY KEY,
    name VARCHAR(50) NOT NULL,
    job VARCHAR(50) NOT NULL,
    superior INTEGER,
    hiredate DATE,
    salary DECIMAL(10,2),
-   deptno INTEGER NOT NULL
+   dept_id INTEGER NOT NULL
 );
 
 -- Note that if several employees work on a project, the record for each employee
 -- contains the name of the project; this redundancy is an example of a bad practice.
 -- Later, we learn how to avoid that.
 CREATE TABLE project (
-   projno INTEGER NOT NULL,
+   proj_id INTEGER NOT NULL,
    name VARCHAR(50) NOT NULL,
-   empno INTEGER NOT NULL
+   emp_id INTEGER NOT NULL
 );
 
 
