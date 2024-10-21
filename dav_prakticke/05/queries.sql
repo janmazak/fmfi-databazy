@@ -27,5 +27,5 @@ Pre citatelov, ktori si nic nepozicali, vratte NULL. */
 
 /* 11. Zmazte knihy, ktore si uz pozical kazdy registrovany citatel. */
 
-/* 12. (1 point) Pridajte k menu kazdeho citatela, ktory mal v kazdom momente pozicanu nanajvys jednu knihu, retazec " Read more!".
-Navod: https://www.postgresql.org/docs/9.1/functions-string.html */
+/* 12. (1 point) Pridajte k menu kazdeho citatela, ktory mal v kazdom momente pozicanu nanajvys jednu knihu, retazec ' Read more!'.
+Navod: https://www.postgresql.org/docs/current/functions-string.html */

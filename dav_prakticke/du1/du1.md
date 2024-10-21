@@ -1,4 +1,4 @@
-# Domáca úloha č. 1 (20 bodov)
+# Domáca úloha č. 1 (15 bodov)
 
 Daná je databáza
 ```
@@ -10,7 +10,7 @@ Daná je databáza
 Atribút `Id` v reláciách `navstivil` a `vypil` je identifikátorom návštevy; každá návšteva zahŕňa práve jedného pijana a práve jednu krčmu. Atribút `Od` udáva čas, kedy návšteva začala. V každom momente môže byť pijan v nanajvýš jednej krčme.
 
 Atribút `Cena` udáva cenu daného alkoholu v danej krčme (ceny sa nemenia). Každá krčma čapuje aspoň jeden alkohol.
-Atribút `Mnozstvo` je celkové množstvo alkohol vypitého pri danej návšteve (pre každú dvojicu `Id, Alkohol` je vo `vypil` nanajvýš jeden záznam); platí `Mnozstvo > 0`.
+Atribút `Mnozstvo` je celkové množstvo jedného alkoholu vypitého pri danej návšteve (pre každú dvojicu `Id, Alkohol` je vo `vypil` nanajvýš jeden záznam); platí `Mnozstvo > 0`.
 Vo `vypil` sú zaznamenané len alkoholy, ktoré čapuje navštívená krčma.
 
 Môžete predpokladať, že databáza neobsahuje žiaden spor (napr. rôzni pijani pre jednu hodnotu `Id` v `navstivil`).
@@ -38,14 +38,13 @@ jedno posedenie. Usporiadajte ich podľa P a A.
 
 ### Technické pokyny
 
-* Termín na odovzdanie: **6. 11. 2023**
+* Termín na odovzdanie: **4. 11. 2024**
 * Používajte korektnú syntax SQL podporovanú databázou SQLite 3.34 (overiť si to môžete trebárs na serveri `cvika.dcs.fmph.uniba.sk`). Riešenia so syntaktickými chybami budú hodnotené len minimálnym počtom bodov.
-* Každý dotaz aj s pomocnými reláciami zapíšte do osobitného súboru s príponou `.sql` pomenovaného písmenom zodpovedajúcim zadanému dotazu (napr. `a.sql`). Okrem komentárov by v ňom nemalo byť nič navyše.
-* Súbory `a.sql`, `b.sql`, `c.sql`, `d.sql` odošlite ako prílohu e-mailu na adresu `jan.mazak@fmph.uniba.sk` s predmetom `DAV-DU1`. Tento e-mail musí v tele obsahovať vaše meno.
+* Každý dotaz aj s pomocnými reláciami zapíšte do osobitného súboru s príponou `.sql` pomenovaného písmenom zodpovedajúcim zadanému dotazu (napr. `a.sql`). **Okrem komentárov by v ňom nemalo byť nič navyše** (napr. žiadne príkazy ako `.mode`).
+* Súbory `a.sql`, `b.sql`, `c.sql`, `d.sql` odošlite ako prílohu e-mailu zo školskej adresy na adresu `jan.mazak@fmph.uniba.sk` s predmetom `DAV-DU1`.
 * Na usporiadaní výsledku dotazu síce zásadne nezáleží, ale robí výsledok deterministickým, preto nezabudnite na príslušný `ORDER BY`.
 
 ### Overenie správnosti riešení
 
 Správnosť riešenia si môžete overiť pre databázu [pijani.sql](testdata/pijani.sql).
 Správne odpovede na dotazy nájdete v súbore [pijani_answers.txt](testdata/pijani_answers.txt).
-
