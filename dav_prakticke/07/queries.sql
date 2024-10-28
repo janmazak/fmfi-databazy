@@ -27,4 +27,4 @@ Použite window functions, nie GROUP BY. */
 /* 10. Pre každého zamestnanca vypíšte jeho poradové číslo v rámci zamestnancov z toho istého mesta
     (pri usporiadaní mien podľa abecedy), rozdiel od priemerného platu v danom meste a počet zamestnancov v tomto meste. */
 
-/* 11. (1 point) Pre každé oddelenie vypíšte, aký podiel na celkovej sume platov tohto oddelenia tvoria platy pod mediánovým platom. */
+/* 11. (1 point) Pre každé oddelenie vypíšte, aký podiel na celkovej sume platov tohto oddelenia tvoria platy pod celkovým mediánovým platom. */
