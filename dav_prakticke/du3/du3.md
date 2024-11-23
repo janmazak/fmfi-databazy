@@ -2,27 +2,24 @@
 
 Úloha pozostáva z dvoch častí: rozšírenie tabuľky evidujúcej vyriešené testy o skóre a napísanie programu, pomocou ktorého budú študenti cez konzolu vypĺňať test. Budeme používať databázu popísanú v [druhej domácej úlohe](../du2/du2.md).
 
-
 ### Skóre
 
 Do tabuľky, kde evidujete vypracovania testov študentmi, pridajte stĺpec pre _skóre_, t.j. podiel správnych odpovedí k celkovému počtu otázok testu, zaokrúhlený na celé percentá (číslo typu DECIMAL s dvomi desatinnými miestami). Skóre určujeme ako podiel, kde menovateľ je vždy celkový počet otázok testu, bez ohľadu na počet zatiaľ zodpovedaných otázok. Tento údaj je možné zistiť z jednotlivých zodpovedaných otázok, preto je redundantný. Umožňuje však rýchlejšie spracovanie dotazov zahŕňajúcich skóre.
 
-Konzistenciu dát v databáze zabezpečíme pomocou nasledovných triggrov:
-1. Trojicu triggrov, ktoré pri _vložení_, _zmene_ a _zmazaní_ odpovede spustia SQL funkciu `update_student_score`, ktorá preráta príslušné skóre.
-2. Dvojicu triggrov, ktoré pri _vložení_ a _zmene_ nového skóre spustia SQL funkciu `check_student_score`, ktorá overí, že skóre zodpovedá príslušným odpovediam. (Trigger pre zmazanie nepotrebujeme, lepšie je riešiť ho na úrovni cudzích kľúčov: spolu s vypracovaním testu zmazať všetky odpovede, alebo naopak nedovoliť zmazanie vypracovania testu, ak sa naň odkazujú nejaké odpovede.)
+Konzistenciu dát v databáze zabezpečíme pomocou SQL funkcie `update_student_score`, ktorá preráta príslušné skóre. (Pozor: nechceme prerátať všetky skóre v databáze, len tie, čo sa týkajú jedného vypracovania testu.) Tá by sa pomocou triggrov mala spustiť v nasledujúcich prípadoch:
+1. Pri _vložení_, _zmene_ a _zmazaní_ odpovede.
+2. Pri _vložení_ a _zmene_ skóre. (Trigger pre zmazanie nepotrebujeme, lepšie je riešiť ho na úrovni cudzích kľúčov: spolu s vypracovaním testu zmazať všetky odpovede, alebo naopak nedovoliť zmazanie vypracovania testu, ak sa naň odkazujú nejaké odpovede.)
 
-Skúste spoločnú časť požadovaných funkcií (samotný výpočet skóre) napísať len na jednom mieste, napr. vytvorením vhodného VIEW či pomocnej funkcie.
-Tieto funkcie by nemali k svojej činnosti vyžadovať kompletnú sadu odpovedí na daný test (aby bolo možné vložiť nulové skóre a vyhli sme sa tak kruhovej závislosti, keď do jednej tabuľky nič nemožno vložiť, lebo v inej chýba záznam, a naopak --- na rozdiel od cudzích kľúčov spustenie triggrov nemožno odložiť na koniec transakcie). Vzhľadom na požadované triggre bude potrebné najprv vložiť nové vypracovanie testu, až potom jednotlivé odpovede.
+Tieto triggre a funkcie by nemali k svojej činnosti vyžadovať kompletnú sadu odpovedí na daný test (aby bolo možné vložiť nulové skóre a vyhli sme sa tak kruhovej závislosti, keď do jednej tabuľky nič nemožno vložiť, lebo v inej chýba záznam, a naopak --- na rozdiel od cudzích kľúčov spustenie triggrov nemožno odložiť na koniec transakcie). Vzhľadom na požadované triggre bude potrebné najprv vložiť nové vypracovanie testu, až potom jednotlivé odpovede.
 
 Požadované funkcie a triggre pridajte do súboru `testy.sql`, v ktorom máte vytváranie databázových tabuliek.
 
 Poznámka:
-Požadované triggre neriešia situáciu dokonale, napr. miesto `check_student_score` by sme skôr chceli zakázať priamu zmenu skóre cez UPDATE,
-to je však dosť komplikované, ak to má ako celok fungovať.
+V PostgreSQL možno použiť jazyk PL/pgSQL.
+V SQLite sú možnosti pre triggre obmedzené, preto sa vám možno nepodarí spraviť jednu univerzálnu funkciu `update_student_score`.
 Jednotlivé databázové systémy ponúkajú aj iné mechanizmy na automatické prepočty,
 napr. [generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html).
 Tým sa v tejto DÚ vyhneme.
-
 
 ### Program
 
