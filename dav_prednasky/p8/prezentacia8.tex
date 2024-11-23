@@ -437,9 +437,10 @@ miesto\\
 (Id, Meno, Priezvisko, RodneCislo).
 \end{frame}
 
-\begin{frame}[fragile]{Príklad}
-Máme databázu kníh; predpokladáme, že každú napísal jediný autor. Atribúty:\\[3mm]
+\begin{frame}[fragile]{Príklad: databáza kníh}
+Atribúty:\\[3mm]
 \begin{minipage}{.4\pdfpagewidth}
+\scriptsize
 \begin{itemize}
 \item ISBN
 \item Názov
@@ -450,6 +451,7 @@ Máme databázu kníh; predpokladáme, že každú napísal jediný autor. Atrib
 \end{itemize}
 \end{minipage}
 \begin{minipage}{.4\pdfpagewidth}
+\scriptsize
 \begin{itemize}
 \item Témy (zoznam tém)
 \item PočetStrán
@@ -459,15 +461,23 @@ Máme databázu kníh; predpokladáme, že každú napísal jediný autor. Atrib
 \item DefiníciaŽánru
 \end{itemize}
 \end{minipage}
-
-\bigskip
-Identifikujte funkčné závislosti a navrhnite vhodnú databázovú schému v BCNF alebo aspoň v 3NF.
-Overte bezstratovosť dekompozície.
+\\[3mm]
+Predpoklady:
+{
+\footnotesize
+\begin{itemize}
+\item Každú knihu napísal jediný autor a má jediný žáner.
+\item Knihu identifikuje dvojica (Názov, Autor), oplatí sa však pridať umelé idDiela, aby sme mali jednoduchý kľúč.
+\item Knihu vydáva len jediné vydavateľstvo, má len jediné vydanie a jeden jazyk.
+    Môže však byť vo viacerých formátoch; ISBN sa prideľuje osobitne pre jednotlivé formáty (papier, ePub, PDF\dots).
+\end{itemize}
+}
+Identifikujte FZ a bezstratovo dekomponujte do BCNF.
 \end{frame}
 
 \begin{frame}[fragile]{Primary keys}
 V relácii (Meno, RodnéČíslo, ČísloPasu) sú atribúty RodnéČíslo a ČísloPasu kľúčmi.
-Pre externé nástroje je výhodné, keď možno záznamy identikovať úplne jednoznačne,
+Pre externé nástroje je výhodné, keď možno záznamy identifikovať úplne jednoznačne,
 preto si zo všetkých kľúčov chceme vybrať primárny.
 \begin{itemize}
 \item PostgreSQL: \alert{PRIMARY KEY} = NOT NULL UNIQUE.
