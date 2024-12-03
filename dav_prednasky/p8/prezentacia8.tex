@@ -58,18 +58,74 @@ Relačný model, jazyk SQL a bežné DBMS poskytujú dostatok prostriedkov na za
 \begin{frame}[fragile]{Entitno-relačný model}
 Pri návrhu vychádzame zo zjednodušeného modelu sveta --- \emph{dátový model}.
 Tieto modely sa bežne kreslia v podobe \alert{entitno-relačných diagramov} (ERM/ERD).
-\begin{itemize}
-\item entitám v tomto modeli zodpovedajú tabuľky,\\ ich atribútom stĺpce
-\item vzťahy 1:N reprezentujeme atribútmi
-\item vzťahy M:N zvyčajne reprezentujeme tabuľkami
-(atribút, ktorého dátovým typom je pole, je takmer vždy v rozpore s dobrou praxou)
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Entitno-relačný model}
 \includegraphics[scale=.5]{erd.png}
 \end{frame}
 
+\begin{frame}[fragile]{Entitno-relačný model}
+Reprezentujeme situáciu na pracovisku. Pre zamestnancov evidujeme meno, mzdu, 
+oddelenie, na ktorom pracujú (len jedno), adresu tohto oddelenia, a zoznam projektov, na ktorých pracujú.
+Pre projekty potrebujeme vedieť názov, rozpočet, zoznam ich zamestnancov a vedúceho projektu.
+
+Nakreslite entitno-relačný diagram:
+\begin{itemize}
+\item Entity sú obdĺžniky, hlavička je názov entity a pod ňou je zoznam atribútov s dátovým typom oddeleným dvojbodkou.
+\item Vzťah medzi entitami zobrazíme neorientovanou hranou medzi obdĺžnikmi, ku ktorému pripíšeme, či ide o 1:1, 1:N, M:N
+(pozor na poradie; označenia 1, M, N sa bežne pripisujú ku koncom hrán).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Entitno-relačný model v SQL}
+Prepis ERM do databázovej schémy v SQL: 
+\begin{itemize}
+\item Entite zodpovedá tabuľka; každý jej atribút je stĺpec tejto tabuľky.
+\item Vzťahy 1:N --- pridáme stĺpec do príslušnej tabuľky, napr. číslo oddelenia v tabuľke zamestnancov.
+\item Vzťahy 1:1 --- tiež pridáme stĺpec (možno si vybrať kam).
+\item Vzťahy M:N --- zvyčajne cez \emph{extra tabuľku} s dvomi stĺpcami pre dvojice entít;
+atribút, ktorého dátovým typom je pole, je takmer vždy v rozpore s dobrou praxou.
+\end{itemize}
+Vzťah M:N možno \uv{povýšiť} na samostatnú entitu, vzniknú tak dva nové vzťahy 1:N.
+To umožňuje pridať ku vzťahu doplňujúce údaje, napr. pre zapísané predmety študentov doplníme semester štúdia a čas zápisu.
+Tieto \uv{vzťahové} entity neraz majú podivné názvy (napr. emp\_project\_assignment).
+\end{frame}
+
+\begin{frame}[fragile]{Terminológia: čo je to \alert{atribút}?}
+\begin{itemize}
+\item V \uv{matematickom} databázovom relačnom modeli je to \alert{\uv{atomický} element}, nad ktorým vytvárame relácie (ako množiny atribútov).
+\item V SQL (čo je praktická implementácia \uv{matematického} modelu) je to \alert{stĺpec tabuľky}; 
+  stĺpce jednotlivých tabuliek sú však nezávislé a na priblíženie sa matematickému modelu slúžia cudzie kľúče.
+\item V ERM je to \alert{vlastnosť entity} (a nesúvisí so vzťahmi medzi entitami, hoci jedno aj druhé musíme v SQL reprezentovať stĺpcami). 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{ERM: vzťah vs. atribút entity}
+Neraz si vyberáme medzi \alert{vzťahom medzi entitami}\\ a \alert{atribútom entity}. Príklady:
+\begin{itemize}
+\item ulica --- relácia s fixným zoznamom existujúcich ulíc a odkazy na ňu / textový atribút bez väzby na čokoľvek iné
+\item \href{https://slovak.statistics.sk/PACVPEM/vocabPagesDetails.html?id=35201&lang=sk}{rodinný stav} ---
+    tabuľka s \uv{vopred daným} zoznamom stavov / textový atribút, kde si každý vyplní, čo chce (resp. obmedzíme cez CHECK)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{ERM: vzťah vs. atribút entity}
+Výhody vytvorenia samostatnej entity:
+\begin{itemize}
+\item Existuje jednoznačný zoznam prípustných hodnôt, využiteľný v UI a klientskych programoch.
+\item Databáza automaticky a transparentne stráži konzistentnosť (napr. preklepy); možno \uv{pekne} reportovať chyby (na rozdiel od CHECK).
+\item Rozšíriteľnosť: nové tabuľky sa môžu cez cudzí kľúč odkazovať na entity; nemusíme zdvojovať CHECK a strážiť, že je identický.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{ERM: vzťah vs. atribút entity}
+Nevýhody vytvorenia samostatnej entity:
+\begin{itemize}
+\item Možno príliš obmedzujúce, napr. fixný zoznam krstných mien či prípustných hodnôt pre položku \uv{hobby}.
+\item Ťažkosti so zmenami zoznamu povolených hodnôt:
+    Kto bude mať oprávnenie meniť či pridávať hodnoty?
+    Ako sa zmena možných hodnôt distribuuje ostatným, aby nepracovali s neplatným zoznamom?
+\item Potenciálne priveľa entít (napr. adresu možno rozbiť na entity ulica, číslo domu, mesto, \dots)
+    a zahltenie stovkami tabuliek vedúce k ľudským chybám alebo nízkemu výkonu.
+\end{itemize}
+\end{frame}
 
 \begin{frame}[fragile]{Redundancia}
 \begin{tabular}{|l|l|l|}
@@ -447,7 +503,7 @@ Atribúty:\\[3mm]
 \item Autor
 \item NárodnosťAutora
 \item Formát
-\item Cena
+\item Cena (odporúčaná)
 \end{itemize}
 \end{minipage}
 \begin{minipage}{.4\pdfpagewidth}
@@ -495,23 +551,29 @@ CREATE TABLE ta (
 \end{alltt}
 \end{frame}
 
-\begin{frame}[fragile]{Primary keys}
+\begin{frame}[fragile]{Surrogate keys}
 Pre niektoré tabuľky nemáme žiadnych prirodzených kandidátov na primárny kľúč
 (napr. ak tabuľka len zachytáva vzťah M:N). Vtedy môžeme pridať ako primárny kľúč
 \alert{surrogate key} --- umelý identifikátor, ktorý jednoznačne identifikuje záznam.
 
 \begin{itemize}
-\item PostgreSQL: SERIAL.
+\item PostgreSQL: atribút typu SERIAL.
 \item SQLite: atribút definovaný ako INTEGER PRIMARY KEY je automaticky aliasom pre ROWID
 (stĺpec s automaticky inkrementovanými hodnotami).
 \end{itemize}
-
-Umelé id možno využiť, aj keď máme iné kľúče, napr. ak sa chceme vyhnúť kompozitným kľúčom
-či pridlhým hodnotám kľúčových atribútov (index nad celými číslami zaberá menej miesta
-a je rýchlejší než nad dlhými reťazcami).
 \end{frame}
 
-\begin{frame}[fragile]{NF a surrogate keys}
+\begin{frame}[fragile]{Surrogate keys}
+Umelé id možno využiť, aj keď máme iné kľúče, ale ich použitie by bolo nevýhodné:
+\begin{itemize}
+\item chceme sa vyhnúť kompozitným kľúčom (ťažšia práca s externými nástrojmi, napr. ORM)
+\item pridlhé hodnoty kľúčových atribútov (index nad celými číslami zaberá menej miesta
+a je rýchlejší než nad dlhými reťazcami)
+\item prirodzený kľúč nechceme zverejniť (napr. rodné číslo, číslo bankovej karty)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Surrogate keys}
 Pridanie umelého id $I$ nemení spĺňanie normálnej formy:
 \begin{itemize}
 \item Ak nejaká FZ pred pridaním $I$ porušovala NF, porušuje ju naďalej.
