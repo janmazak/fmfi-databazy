@@ -55,11 +55,33 @@ Neraz ide o kompromis medzi blízkosťou k ideálnemu návrhu a výkonom v praxi
 Relačný model, jazyk SQL a bežné DBMS poskytujú dostatok prostriedkov na zabezpečenie integrity dát.
 \end{frame}
 
-\begin{frame}[fragile]{Entitno-relačný model}
+\begin{frame}[fragile]{Entitno-relačný model (ERM)}
 Pri návrhu vychádzame zo zjednodušeného modelu sveta --- \emph{dátový model}.
-Tieto modely sa bežne kreslia v podobe \alert{entitno-relačných diagramov} (ERM/ERD).
-\includegraphics[scale=.5]{erd.png}
+Tieto modely sa bežne kreslia v podobe \alert{entitno-relačných diagramov} (ERD).
+\\[5mm]
+
+\includegraphics[scale=.17]{erd1.png}
+\\[5mm]
+
+ERM možno vytvárať na rôznej úrovni podľa množstva detailov: konceptuálna, logická, fyzická.
 \end{frame}
+
+\begin{frame}[fragile]{Entitno-relačný model}
+\includegraphics[scale=.5]{erd2.png}
+
+Oproti predošlému obrázku pribudli dátové typy, sme bližšie k finálnej databázovej schéme.
+\end{frame}
+
+\begin{frame}[fragile]{Entitno-relačný model}
+Súčasti ERM:
+\begin{itemize}
+\item entity
+\item atribúty jednotlivých entít
+\item jednoznačné identifikátory entít (primárne kľúče)
+\item vzťahy medzi entitami a ich násobnosť
+\end{itemize}
+\end{frame}
+
 
 \begin{frame}[fragile]{Entitno-relačný model}
 Reprezentujeme situáciu na pracovisku. Pre zamestnancov evidujeme meno, mzdu, 
@@ -88,6 +110,24 @@ To umožňuje pridať ku vzťahu doplňujúce údaje, napr. pre zapísané predm
 Tieto \uv{vzťahové} entity neraz majú podivné názvy (napr. emp\_project\_assignment).
 \end{frame}
 
+\begin{frame}[fragile]{ERM: ternárne vzťahy (pre 3 entity)}
+V ERM možno reprezentovať aj vzťahy viac ako 2 entít.
+Stačí z ternárneho vzťahu $R$ spraviť samostatnú entitu a pridať jej väzby na entity, ktorých sa vzťah týka.
+
+\centerline{\includegraphics[scale=.15]{erm_ternary.png}}
+
+Pozrite si príklad: \href{https://vertabelo.com/blog/ternary-relationship/}{(link)}\\
+\end{frame}
+
+\begin{frame}[fragile]{ERM: ternárne vzťahy (pre 3 entity)}
+Všeobecne: hypergraf vieme reprezentovať bipartitným grafom.
+Tento postup je však dosť neprirodzený a viacnásobné vzťahy je jednoduchšie priamo reprezentovať v databázovom relačnom modeli.
+
+Pre ternárny vzťah vieme rovno pridať reláciu a stačí správne popísať násobnosť priradenia
+(napr. že pre každú dvojicu AB existuje najviac jedna hodnota C tak, že ABC sú v relácii).
+\end{frame}
+
+
 \begin{frame}[fragile]{Terminológia: čo je to \alert{atribút}?}
 \begin{itemize}
 \item V \uv{matematickom} databázovom relačnom modeli je to \alert{\uv{atomický} element}, nad ktorým vytvárame relácie (ako množiny atribútov).
@@ -110,6 +150,7 @@ Neraz si vyberáme medzi \alert{vzťahom medzi entitami}\\ a \alert{atribútom e
 Výhody vytvorenia samostatnej entity:
 \begin{itemize}
 \item Existuje jednoznačný zoznam prípustných hodnôt, využiteľný v UI a klientskych programoch.
+\item Spoľahlivé vyhľadávanie (nemusíme premýšľať, či niekto nepoužil iný reťazec na popis tej istej veci).
 \item Databáza automaticky a transparentne stráži konzistentnosť (napr. preklepy); možno \uv{pekne} reportovať chyby (na rozdiel od CHECK).
 \item Rozšíriteľnosť: nové tabuľky sa môžu cez cudzí kľúč odkazovať na entity; nemusíme zdvojovať CHECK a strážiť, že je identický.
 \end{itemize}
@@ -474,6 +515,48 @@ P\fz C
 \end{eqnarray*}
 1. Nájdite všetky kľúče tejto relácie.\\
 2. Dekomponujte ju do 3NF, prípadne BCNF.
+\end{frame}
+
+\begin{frame}[fragile]{Overenie NF}
+\uv{Byť v normálnej forme} nie je \uv{existenčná} vlastnosť:
+nestačí čosi malé nájsť a ukázať, že to má požadované vlastnosti;
+naopak treba zdôvodniť, že neexistuje závislosť, ktorá by NF pokazila.
+\bigskip
+
+Typická relácia (napr. zodpovedajúca entite v ERM)
+má primárny kľúč a od neho funkčne závislé atribúty.
+Z toho však nijako nevyplýva, že je v NF; treba skúmať všetky potenciálne platné závislosti
+medzi ostatnými atribútmi.
+\bigskip
+
+Postup pre 3NF a BCNF (jediné dve v praxi zaujímavé NF):
+podľa ich definícií stačí skúmať závislosti, ktoré majú na pravej strane práve jeden atribút.
+\end{frame}
+
+\begin{frame}[fragile]{Overenie NF}
+Zoberieme všetky podmnožiny atribútov relácie $R$ ako potenciálne ľavé strany platnej FZ;
+pre každú podmnožinu $L$ treba zistiť všetky možné pravé strany.
+\begin{itemize}
+\item Ak máme kompletnú množinu FZ, vypočítame uzáver $L$.
+Ak sa v uzávere vyskytne atribút, ktorý nie je na ľavej strane, porovnáme túto FZ s definíciou príslušnej NF
+(pri testovaní 3NF je vhodné poznať všetky kľúče $R$).
+
+\item Alebo postupujeme podľa definície FZ: pre $L\fz A$ sa pýtame,
+či môžu pre danú hodnotu $L$ existovať dve rôzne hodnoty $A$
+(odpovedať musí niekto, kto rozumie modelovanému svetu).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Overenie NF}
+Bežné chyby:
+\begin{itemize}
+\item Miesto uzáveru množiny všetkých FZ pracujeme len s FZ v konkrétnej reprezentácii tohto uzáveru (napr. niektoré minimálne pokrytie).
+Napr. máme zapísané $A\fz X$, $X\fz B$, a pre reláciu obsahujúcu $A$ aj $B$ si nevšimneme, že v nej platí $A\fz B$.
+\item Pri návrhu databázy zriedka pracujeme s reláciou, ktorá obsahuje všetky atribúty
+(hoci virtuálne taká vždy existuje, stačí si predstaviť join všetkých relácií v dekompozícii).
+Miesto toho máme čiastočnú dekompozíciu, z ktorej nemusí byť vidno vzťahy medzi jednotlivými jej časťami.
+Ak robíte dekompozíciu bez kompletnej množiny FZ, je vhodné začať do samostatných relácií oddeľovať atribúty, ktoré s inými zjavne nesúvisia.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Normalizácia}
