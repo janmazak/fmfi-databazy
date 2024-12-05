@@ -1,7 +1,7 @@
 # Návrh databázovej schémy
 
 Úloha sa rieši v skupinách s 1-3 členmi.
-Odovzdať do **12. 12. 2024** 23:59 e-mailom (jeden za celú skupinu, členovia skupiny do kópie).
+Odovzdať do **12. 12. 2024** 23:59 e-mailom na `jan.mazak@fmph.uniba.sk` (jeden za celú skupinu, členovia skupiny do kópie).
 
 # Popis modelovaného sveta
 
@@ -35,4 +35,4 @@ V ERM by atribút entity nemal priamo súvisieť s inými entitami či ich atrib
 Vnútri entity však môžu existovať platné funkčné závislosti, napr. ak máme viac ako jeden kľúč.
 
 Pred prácou na úlohe si prejdite prezentáciu z prednášky a prípadne tiež
-[túto ďalšiu](https://github.com/janmazak-fmfi/databazy/blob/main/dav_prednasky/p8/prezentacia8.pdf?raw=true).
+[túto ďalšiu](https://github.com/janmazak-fmfi/databazy/blob/main/dav_prednasky/p8/prezentacia8.pdf).
