@@ -406,8 +406,29 @@ Je táto dekompozícia bezstratová?
 
 \bigskip
 Označme $Z = Zamestnanec$, $P = Pracovisko$, $A = AdresaPracoviska$.\\[2mm]
-V $r$ platia FZ $Z\fz P$, $P\fz A$. Preto $P$ ($= r_1\cap r_2$) je kľúč v $r_2$ a do (natural) joinu $r_1\bowtie r_2$
+V $r$ platí $Z\fz P$, $P\fz A$. Preto $P$ ($= r_1\cap r_2$) je kľúč v $r_2$ a do (natural) joinu $r_1\bowtie r_2$
 sa nemôže dostať záznam, ktorý v $r$ nebol, pretože tento join ku každému riadku $r_1$ len doplní hodnotu $A$ z $r_2$.
+\end{frame}
+
+\begin{frame}[fragile]{Dekompozícia relácií --- bezstratovosť}
+Veta: Dekompozícia $XYZ$ do $XY$ a $XZ$ je bezstratová práve vtedy, keď $X$ je nadkľúčom v $XY$ alebo v $XZ$.
+\\[5mm]
+
+Dôkaz: Ak $X$ je nadkľúčom v $XY$ (čiže $X\fz Y$), tak join $XY\bowtie XZ$ len pripíše hodnotu $Y$ k záznamom v $XZ$, dekompozícia preto je bezstratová.
+\\[5mm]
+
+Predpokladajme, že neplatí $X\fz Y$ ani $X\fz Z$. Ak $XYZ$ obsahuje $xy_1z_1$ a $xy_2z_2$, join $XY\bowtie XZ$ bude obsahovať aj $xy_1z_2$.
+\end{frame}
+
+\begin{frame}[fragile]{Dekompozícia relácií --- bezstratovosť}
+Bezstratovosť je iná vlastnosť ako zachovanie funkčných závislostí.
+Uvažujme reláciu $ABC$ s jedinou FZ $A\fz B$, ktorú dekomponujeme do $AB$ a $BC$.
+\\[5mm]
+
+FZ ostala zachovaná, ale $AB$ a $BC$ sa nespájajú bezstratovo, lebo spoločný atribút $B$ nie je kľúčom v $AB$ ani v $BC$.
+\\[5mm]
+
+(Vhodnejšia dekompozícia je $AB$ a $AC$. Overte, že je bezstratová.)
 \end{frame}
 
 \begin{frame}[fragile]{Dekompozícia relácií}
