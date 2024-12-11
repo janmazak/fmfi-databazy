@@ -52,7 +52,7 @@ Niekedy nás nezaujímajú jednotlivé záznamy relácie, ale jedna agregátna h
 \begin{alltt}
 /* počet zamestnancov */
 
-SELECT \alert{COUNT}(e.empno)
+SELECT \alert{COUNT}(e.emp_id)
 FROM employee e
 \end{alltt}
 Agregačné funkcie: COUNT, SUM, AVG, MAX, MIN\dots
@@ -64,14 +64,28 @@ Na výstupe bude pre každú skupinu 1 riadok.
 \begin{alltt}
 /* počet zamestnancov v jednotlivých oddeleniach */
 
-SELECT e.deptno, \alert{COUNT}(e.empno) AS c
+SELECT e.dept_id, \alert{COUNT}(e.emp_id) AS c
 FROM employee e
-\alert{GROUP BY} e.deptno
-\blue{HAVING} COUNT(e.empno) > 1
+\alert{GROUP BY} e.dept_id
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia}
+\blue{HAVING} umožňuje filtrovať skupiny.
+(Pomenovanie atribútov vytvorených agregáciou za SELECT sa nedá použiť za \blue{HAVING}.)
+{
+\small
+\begin{alltt}
+/* počet zamestnancov v oddeleniach s > 1 zamestnancom */
+\end{alltt}
+}
+\begin{alltt}
+SELECT e.dept_id, \alert{COUNT}(e.emp_id) AS c
+FROM employee e
+\alert{GROUP BY} e.dept_id
+\blue{HAVING} COUNT(e.emp_id) > 1
 \end{alltt}
 \bigskip
-\blue{HAVING} umožňuje filtrovať skupiny.\\
-(Pomenovanie atribútov vytvorených agregáciou za SELECT sa nedá použiť za \blue{HAVING}.)
 \end{frame}
 
 \begin{frame}[fragile]{Agregácia}
@@ -80,10 +94,10 @@ Mimo dotazu môžu ísť len agregované hodnoty a atribúty, na ktorých sa vš
 \begin{alltt}
 /* počet zamestnancov v jednotlivých oddeleniach */
 
-SELECT \blue{d.name}, \alert{COUNT}(e.empno) AS c
+SELECT \blue{d.name}, \alert{COUNT}(e.emp_id) AS c
 FROM employee e
-    JOIN department d ON e.deptno = d.deptno
-\alert{GROUP BY} d.deptno, \blue{d.name}
+    JOIN department d ON e.dept_id = d.dept_id
+\alert{GROUP BY} d.dept_id, \blue{d.name}
 \end{alltt}
 (Pridanie \verb|d.name| nemá vplyv na rozdelenie riadkov do skupín.)
 \end{frame}
@@ -94,10 +108,10 @@ Do skupín možno deliť aj podľa viacerých atribútov súčasne (riadky v sku
 /* počet zamestnancov v skupinách podľa platu
 v jednotlivých oddeleniach */
 
-SELECT d.name, d.salary, \alert{COUNT}(e.empno) AS c
+SELECT d.name, d.salary, \alert{COUNT}(e.emp_id) AS c
 FROM employee e
-    JOIN department d ON e.deptno = d.deptno
-\alert{GROUP BY} d.deptno, d.name, e.salary
+    JOIN department d ON e.dept_id = d.dept_id
+\alert{GROUP BY} d.dept_id, d.name, e.salary
 \end{alltt}
 \end{frame}
 
@@ -111,6 +125,34 @@ Napríklad:
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Agregácia --- chyby}
+Vnáranie agregovaných funkcií je neprípustné:
+\begin{alltt}
+SELECT \alert{MAX(COUNT(...))} ...
+
+/* správne: najprv COUNT,
+   potom MAX v ďalšom SELECTe */
+\end{alltt}
+\vspace{10mm}
+Agregačnú funkciu nemožno aplikovať priamo na reláciu:
+\begin{alltt}
+WHERE x = \alert{MAX(r)} ...
+
+/* správne: x = (SELECT MAX(...) FROM r) */
+\end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]{Agregácia --- chyby}
+Dvojitá agregácia sa veľmi ťažko číta, neraz nefunguje (kvôli duplicite hodnôt vznikajúcej pri karteziánskom súčine) a je zdrojom chýb:
+\begin{alltt}
+FROM r, s
+...
+HAVING COUNT(r.x) = COUNT(s.y)
+/* lepšie rozdeliť do osobitných SELECTov */
+\end{alltt}
+\end{frame}
+
+
 \begin{frame}[fragile]{WITH --- Common Table Expressions (CTE)}
 WITH vytvorí reláciu existujúcu len počas výpočtu dotazu.
 \bigskip
@@ -118,6 +160,7 @@ WITH vytvorí reláciu existujúcu len počas výpočtu dotazu.
 \alert{WITH} \blue{pijanPocetAlkoholov}(pijan, c) AS (
     SELECT pijan, COUNT(DISTINCT alkohol)
     FROM lubi
+    GROUP BY pijan
 )
 SELECT MAX(ppa.c)
 FROM \blue{pijanPocetAlkoholov} ppa
@@ -132,6 +175,7 @@ V jednom dotaze možno za WITH vymenovať aj viacero relácií oddelených čiar
 \alert{WITH} \blue{pijanPocetAlkoholov}(pijan, c) AS (
     SELECT pijan, COUNT(DISTINCT alkohol)
     FROM lubi
+    GROUP BY pijan
 )
 SELECT ppa.pijan
 FROM \blue{pijanPocetAlkoholov} ppa
@@ -143,6 +187,201 @@ WHERE ppa.c = (
 \bigskip
 \end{frame}
 
+\begin{frame}[fragile]{Vnorené dotazy (subqueries)}
+Podľa toho, či výsledok vnoreného dotazu závisí od riadka, pre ktorý sa vyhodnocuje WHERE, rozlišujeme:
+\begin{itemize}
+\item \alert{nekorelované} --- nezávisí
+\item \alert{korelované} --- zavisí
+\end{itemize}
+Nekorelované dotazy stačí počítať raz, kým korelované musíme počítať pre každý riadok nanovo.
+Navyše narúšajú optimalizáciu (prepis dotazu do výpočtovo výhodnejšej podoby), 
+pretože vo všeobecnosti je ťažké hľadať súvis medzi programom a podprogramom.
+Korelované vnorené dotazy sú preto niekedy veľmi pomalé; vyhýbajte sa im.
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy --- NOT IN}
+\footnotesize
+\emph{Zamestnanci, ktorých nadriadený nie je priamym podriadeným prezidenta.}\\[7mm]
+\begin{minipage}{.4\pdfpagewidth}
+\alert{Un}correlated subquery: $10^5$
+\footnotesize
+\begin{alltt}
+SELECT e.emp_id, e.superior
+FROM employee e
+WHERE \blue{e.superior NOT IN} (
+  SELECT \blue{s.emp_id}
+  FROM employee s
+  JOIN employee p
+    ON s.superior = p.emp_id
+  WHERE p.job = 'president'
+);
+
+\end{alltt}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{.4\pdfpagewidth}
+Antijoin: $10^5$
+\footnotesize
+\begin{alltt}
+SELECT e.emp_id, e.superior
+FROM employee e
+WHERE \blue{NOT EXISTS} (
+  SELECT 1
+  FROM employee s
+  JOIN employee p
+    ON s.superior = p.emp_id
+  WHERE p.job = 'president'
+    \blue{AND s.emp_id = e.superior}
+);
+\end{alltt}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy --- scalar subquery}
+\footnotesize
+\emph{Zamestnanci zarábajúci viac ako priemer v ich oddelení.}\\[7mm]
+\begin{minipage}{.4\pdfpagewidth}
+Correlated subquery: $10^{10}$
+\footnotesize
+\begin{alltt}
+SELECT e.emp_id, e.salary
+FROM employee e
+WHERE \blue{e.salary >} (
+  SELECT AVG(e2.salary)
+  FROM employee e2
+  WHERE e2.dept_id = 
+    e.dept_id
+);
+
+
+
+\end{alltt}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{.4\pdfpagewidth}
+Join: $10^{5}$
+\footnotesize
+\begin{alltt}
+WITH dept_avg AS (
+  SELECT dept_id,
+    AVG(salary) AS avg_salary
+  FROM employee
+  GROUP BY dept_id
+)
+SELECT e.emp_id, e.salary
+FROM employee e
+  JOIN dept_avg da
+    ON e.dept_id = da.dept_id
+WHERE \blue{e.salary >} da.avg_salary;
+\end{alltt}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy --- ALL}
+\footnotesize
+\emph{Zamestnanci zarábajúci viac ako všetci ich podriadení.}\\[7mm]
+\begin{minipage}{.4\pdfpagewidth}
+Correlated subquery: $10^{11}$
+\footnotesize
+\begin{alltt}
+SELECT e.name
+FROM employee e
+WHERE e.salary > \blue{ALL} (
+  SELECT s.salary
+  FROM employee s
+  WHERE s.superior = e.emp_id
+);
+
+\end{alltt}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{.4\pdfpagewidth}
+Antijoin: $10^{5}$
+\footnotesize
+\begin{alltt}
+SELECT e.name
+FROM employee e
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM employee s
+  WHERE s.superior = e.emp_id
+  AND e.salary <= s.salary
+);
+\end{alltt}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy --- ANY}
+\footnotesize
+\emph{Zamestnanci zarábajúci viac ako nejaký ich podriadený.}\\[7mm]
+\begin{minipage}{.4\pdfpagewidth}
+Correlated subquery: $10^{11}$
+\footnotesize
+\begin{alltt}
+SELECT e.name
+FROM employee e
+WHERE e.salary > \blue{ANY} (
+  SELECT s.salary
+  FROM employee s
+  WHERE s.superior = e.emp_id
+);
+\end{alltt}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{.4\pdfpagewidth}
+Join: $10^{5}$
+\footnotesize
+\begin{alltt}
+SELECT e.name
+FROM employee e
+  JOIN employee sub
+    ON sub.superior = e.emp_id
+WHERE e.salary > sub.salary;
+
+
+\end{alltt}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Vnorené dotazy}
+Nevýhody correlated subquery:
+\begin{itemize}
+\item Niekedy horšia čitateľnosť (inokedy lepšia).
+\item Ťažšie debugovanie (lebo korelovaný dotaz nie je sám osebe zmysluplný a je previazaný s kontextom).
+\item Komplexita sťažuje budúce udržiavanie/modifikáciu kódu.
+\item Horšie využívanie existujúcich indexov (vytvorenie ad-hoc zoznamu pre IN, ALL atď. preruší prepojenie na existujúce tabuľky).
+\item Prekážka pre optimalizáciu (ťažko sa hľadá alternatívny spôsob výpočtu); čím viac dát, tým väčší problém.
+\item Treba si strážiť prítomnosť NULL.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vnorené dotazy za FROM --- fuj, radšej WITH}
+\scriptsize
+\begin{alltt}
+SELECT outer_query.emp_id, outer_query.name, outer_query.total_salary
+FROM (
+  SELECT middle_query.emp_id,
+    middle_query.salary + COALESCE(middle_query.bonus, 0) AS total_salary
+  FROM (
+    SELECT e.emp_id, e.name, e.salary,
+      (SELECT SUM(b.amount)
+       FROM (
+         SELECT bonus.emp_id, bonus.amount
+         FROM employee_bonus bonus
+         WHERE bonus.amount > 1000
+       ) AS filtered_bonus
+       WHERE filtered_bonus.emp_id = e.emp_id
+      ) AS bonus
+    FROM (
+      SELECT emp_id, name, salary
+      FROM employee
+      WHERE salary > 50000
+    ) AS e
+  ) AS middle_query
+) AS outer_query
+WHERE outer_query.total_salary > 60000;
+\end{alltt}
+\end{frame}
 
 \begin{frame}{Literatúra}
 \begin{itemize}
