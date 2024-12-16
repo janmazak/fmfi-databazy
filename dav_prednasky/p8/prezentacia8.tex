@@ -588,13 +588,14 @@ Preto na ich vynútenie postačí v SQL UNIQUE\\
 \bigskip
 
 Prehnaná normalizácia vedie k binárnym reláciám\\
-(tie sú vždy v BCNF).
-
-\bigskip
-Príklad: binárne relácie\\
+(tie sú vždy v BCNF), napr. binárne relácie\\
 (Id, Meno), (Id, Priezvisko), (Id, RodneCislo)\\
 miesto\\
 (Id, Meno, Priezvisko, RodneCislo).
+\bigskip
+
+Normalizácia núti používateľov písať joiny, ktoré naspäť pospájajú tabuľky.
+Tie najbežnejšie či netriviálne možno napísať vopred v podobe VIEW.
 \end{frame}
 
 \begin{frame}[fragile]{Príklad: databáza kníh}
@@ -670,10 +671,11 @@ Pre niektoré tabuľky nemáme žiadnych prirodzených kandidátov na primárny 
 \begin{frame}[fragile]{Surrogate keys}
 Umelé id možno využiť, aj keď máme iné kľúče, ale ich použitie by bolo nevýhodné:
 \begin{itemize}
-\item chceme sa vyhnúť kompozitným kľúčom (ťažšia práca s externými nástrojmi, napr. ORM)
+\item prirodzený kľúč nechceme zverejniť (napr. rodné číslo, číslo bankovej karty)
 \item pridlhé hodnoty kľúčových atribútov (index nad celými číslami zaberá menej miesta
 a je rýchlejší než nad dlhými reťazcami)
-\item prirodzený kľúč nechceme zverejniť (napr. rodné číslo, číslo bankovej karty)
+\item chceme sa vyhnúť kompozitným kľúčom (ťažšia práca s externými nástrojmi, napr. ORM)
+\item pribúda počet atribútov v cudzích kľúčoch (pri ich reťazení)
 \end{itemize}
 \end{frame}
 
@@ -839,6 +841,39 @@ Možnosti pri definícii cudzieho kľúča:
 \item \green{NOT DEFERRABLE} -- vždy okamžité vyhodnocovanie
 \item \green{DEFERRABLE INITIALLY IMMEDIATE} -- v rámci tx možno zvoliť, kedy vyhodnocovať, default je ihneď
 \item \green{DEFERRABLE INITIALLY DEFERRED} -- v rámci tx možno zvoliť, kedy vyhodnocovať, default je commit
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Mazanie záznamov}
+Pri nastavení ON DELETE treba postupovať citlivo.
+\\[2mm]
+Použitie CASCADE vedie k implicitnému mazaniu, ktorého si autor dotazu nemusí byť vedomý.
+Napríklad pri mazaní objednávky je jasné, že bude zmazaný aj zoznam produktov z tejto objednávky,
+ale pri mazaní učiteľa nechceme prísť o dáta z hodnotenia študentov, ktoré sú naňho naviazané, ani o materiály, ktoré pre školu vytvoril.
+\\[2mm]
+Použitie RESTRICT spraví mazanie explicitným.
+Klientsky program si napr. môže vyžiadať zoznam mazaných objektov a nechať ho potvrdiť používateľom,
+alebo zmeniť naviazanie cez cudzie kľúče na nezmazané záznamy.
+\end{frame}
+
+\begin{frame}[fragile]{Mazanie záznamov}
+Nevýhody ON DELETE CASCADE:
+\begin{itemize}
+\item Nezamýšľaná strata záznamov.
+\item Náročnejšie debugovanie --- ťažšie logovanie či pátranie po príčine straty dát.
+\item Pokles výkonu pri masívnom mazaní --- tabuľka, z ktorej sa maže veľa vecí, ostane pre ostatné transakcie de facto zablokovaná.
+Mazanie môže trvať dlhé minúty a autor DELETE to nemusí vedieť.
+\item Bezpečnostné problémy, napr. ak máme prístupové práva na úrovni jednotlivých záznamov.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Mazanie záznamov}
+Ďalšie možnosti:
+\begin{itemize}
+\item {\emph{Soft delete}}: Záznamy len označíme (v extra stĺpci) ako zmazané, ale ponecháme v databáze. Cez trigger sa dá spraviť cascade.
+Nevýhoda: vo všetkých dotazoch potom musíme filtrovať cez pridaný flag.
+\item Tabuľka historických hodnôt: zmazané záznamy presúvame (napr. trigger) do inej tabuľky a pripíšeme k nim obdobie platnosti.
+\item Temporal tables (SQL Server).
 \end{itemize}
 \end{frame}
 
